@@ -3,9 +3,8 @@
 # ----------------------- #
 
 url: http://vivekn.github.io
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+title: Vivek Narayanan's blog
+author: Vivek Narayanan
 simple_search: http://google.com/search
 description:
 
@@ -63,13 +62,13 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 
 # Github repositories
-github_user:
-github_repo_count: 0
+github_user: vivekn
+github_repo_count: 5
 github_show_profile_link: true
 github_skip_forks: true
 
 # Twitter
-twitter_user:
+twitter_user: _vivek_n
 twitter_tweet_button: true
 
 # Google +1
@@ -94,7 +93,7 @@ disqus_short_name:
 disqus_show_comment_count: false
 
 # Google Analytics
-google_analytics_tracking_id:
+google_analytics_tracking_id: UA-44840523-1
 
 # Facebook Like
-facebook_like: false
+facebook_like: true
