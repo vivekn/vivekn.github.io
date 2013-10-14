@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Vivek Narayanan's blog</title>
+  <title>The Travelling Santa Problem - Vivek Narayanan's blog</title>
   <meta name="author" content="Vivek Narayanan">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://vivekn.github.io">
+  <link rel="canonical" href="http://vivekn.github.io/blog/2012/12/30/travelling-santa-problem">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Vivek Narayanan's blog" type="application/atom+xml">
@@ -73,15 +73,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/12/30/travelling-santa-problem/">The Travelling Santa Problem</a></h1>
+      <h1 class="entry-title">The Travelling Santa Problem</h1>
     
     
       <p class="meta">
@@ -104,7 +101,7 @@
   </header>
 
 
-  <div class="entry-content"><p>I spent the past couple of days on a problem called the &ldquo;Travelling Santa Problem&rdquo;, a variant of the NP complete &ldquo;<a href="en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling Salesman Problem</a>&rdquo;. There is an ongoing competition on Kaggle, a site which hosts various machine learning and optimization contests. In the original TSP problem you need to find a tour of a graph, visiting every vertex exactly once, minimizing the total cost. Since there can be an arbitrarily large (exponential in number of vertices) number of such paths (Hamiltonian cycles), no polynomial time exact algorithm is known for this problem. Applications of TSP are in the areas of scheduling, logistics and implementation of electronic circuitry. Kaggle&rsquo;s <a href="http://www.kaggle.com/c/traveling-santa-problem">version</a> of the problem gives you a set of 150000 points on a two dimensional plane, and you need to find two paths, that visit all the points and have no edges that are common to both the paths, ie, disjoint paths. The aim of the contest is to find the minimum distance and your score is the distance on the longer path.</p>
+<div class="entry-content"><p>I spent the past couple of days on a problem called the &ldquo;Travelling Santa Problem&rdquo;, a variant of the NP complete &ldquo;<a href="en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling Salesman Problem</a>&rdquo;. There is an ongoing competition on Kaggle, a site which hosts various machine learning and optimization contests. In the original TSP problem you need to find a tour of a graph, visiting every vertex exactly once, minimizing the total cost. Since there can be an arbitrarily large (exponential in number of vertices) number of such paths (Hamiltonian cycles), no polynomial time exact algorithm is known for this problem. Applications of TSP are in the areas of scheduling, logistics and implementation of electronic circuitry. Kaggle&rsquo;s <a href="http://www.kaggle.com/c/traveling-santa-problem">version</a> of the problem gives you a set of 150000 points on a two dimensional plane, and you need to find two paths, that visit all the points and have no edges that are common to both the paths, ie, disjoint paths. The aim of the contest is to find the minimum distance and your score is the distance on the longer path.</p>
 
 <p>If you visualize the set of points, you get a picture of Santa.</p>
 
@@ -124,22 +121,16 @@
 
 <p>What I learned from this competition was that NP complete problems could be approximated reasonably within a short amount of time, and the last mile takes a <strong>humongous</strong> effort, and whether its worth it is questionable. I also got to know about some randomized algorithms and Monte Carlo simulations. You can find my C++ code over <a href="https://github.com/vivekn/tsp-heuristics">here</a>.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/">Roll Your Own Autocomplete Solution Using Tries</a></h1>
-    
-    
-      <p class="meta">
-        
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Vivek Narayanan</span></span>
+
+      
 
 
 
@@ -151,57 +142,38 @@
   
 
 
-<time datetime="2012-02-25T17:48:00+05:30" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
-        
-      </p>
+<time datetime="2012-12-30T17:48:00+05:30" pubdate data-updated="true">Dec 30<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/algorithms/'>algorithms</a>, <a class='category' href='/blog/categories/contests/'>contests</a>
+  
+</span>
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>You might have come across many websites with autocomplete suggestions, most notably Google.</p>
-
-<p><img src="http://storage.googleapis.com/support-kms-prod/SNP_67CE1E2EEBBDA24AC636DF84A911964629C8_3207874_en_v1" alt="Google Autocomplete" /></p>
-
-<p>Adding such an option to your site or application might seem daunting but there is a very simple recursive data structure that solves the problem. There is a ton of literature on the net on how to do this using black box approaches like Lucene, Solr, Sphinx, Redis etc. But all these packages require a lot of configuration and you also lose flexibility. Tries can be implemented in a few lines of code in any language of your choice.</p>
-
-<p><img align="middle" alt="Trie" height="280" src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Trie_example.svg/400px-Trie_example.svg.png" width="300" /></p>
-
-<p>A trie is basically a tree, with each node representing a letter as illustrated in the figure above. Words are paths along this tree and the root node has no characters associated with it.</p>
-
-<ol><li>The value of each node is the path or the character sequence leading upto it.</li>&#13;
-<li>The children at each node are ideally represented using a hash table mapping the next character to the child nodes.</li>&#13;
-<li>Its also useful to set a flag at every node to indicate whether a word/phrase ends there.</li>&#13;
-</ol>
-
-
-<p>Now we can define methods to insert a string and to search for one.</p>
-
-<script src="https://gist.github.com/1906905.js?file=trie.py"></script>
-
-
-<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node&rsquo;s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
-
-<script src="https://gist.github.com/1906922.js?file=trie.py"></script>
-
-
-<p>To delete an item,  first traverse down to the leaf of the keyword and then work backwards, checking for common paths.</p>
-
-<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete"><a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a></a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
-
-<p><strong>Update: </strong>Thanks to bmahler on reddit for pointing out that the wordlist approach was unnecessary and space inefficient. It has been corrected.</p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://vivekn.github.io/blog/2012/12/30/travelling-santa-problem/" data-via="_vivek_n" data-counturl="http://vivekn.github.io/blog/2012/12/30/travelling-santa-problem/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/" title="Previous Post: Roll your own autocomplete solution using Tries">&laquo; Roll your own autocomplete solution using Tries</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -222,7 +194,7 @@
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/vivekn">@vivekn</a> on GitHub
@@ -254,6 +226,7 @@
 
   
 </aside>
+
 
     </div>
   </div>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Vivek Narayanan's blog]]></title>
-  <link href="http://vivekn.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: algorithms | Vivek Narayanan's blog]]></title>
+  <link href="http://vivekn.github.io/blog/categories/algorithms/atom.xml" rel="self"/>
   <link href="http://vivekn.github.io/"/>
   <updated>2013-10-14T18:18:45+05:30</updated>
   <id>http://vivekn.github.io/</id>

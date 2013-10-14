@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Roll your own autocomplete solution using Tries - Vivek Narayanan's blog</title>
+  <meta name="author" content="Vivek Narayanan">
+
+  
+  <meta name="description" content="You might have come across many websites with autocomplete suggestions, most notably Google. Adding such an option to your site or application might &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://vivekn.github.io/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Vivek Narayanan's blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-44840523-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Vivek Narayanan's blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:vivekn.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Roll Your Own Autocomplete Solution Using Tries</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-25T17:48:00+05:30" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>You might have come across many websites with autocomplete suggestions, most notably Google.</p>
+
+<p><img src="http://storage.googleapis.com/support-kms-prod/SNP_67CE1E2EEBBDA24AC636DF84A911964629C8_3207874_en_v1" alt="Google Autocomplete" /></p>
+
+<p>Adding such an option to your site or application might seem daunting but there is a very simple recursive data structure that solves the problem. There is a ton of literature on the net on how to do this using black box approaches like Lucene, Solr, Sphinx, Redis etc. But all these packages require a lot of configuration and you also lose flexibility. Tries can be implemented in a few lines of code in any language of your choice.</p>
+
+<p><img align="middle" alt="Trie" height="280" src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Trie_example.svg/400px-Trie_example.svg.png" width="300" /></p>
+
+<p>A trie is basically a tree, with each node representing a letter as illustrated in the figure above. Words are paths along this tree and the root node has no characters associated with it.</p>
+
+<ol><li>The value of each node is the path or the character sequence leading upto it.</li>&#13;
+<li>The children at each node are ideally represented using a hash table mapping the next character to the child nodes.</li>&#13;
+<li>Its also useful to set a flag at every node to indicate whether a word/phrase ends there.</li>&#13;
+</ol>
+
+
+<p>Now we can define methods to insert a string and to search for one.</p>
+
+<script src="https://gist.github.com/1906905.js?file=trie.py"></script>
+
+
+<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node&rsquo;s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
+
+<script src="https://gist.github.com/1906922.js?file=trie.py"></script>
+
+
+<p>To delete an item,  first traverse down to the leaf of the keyword and then work backwards, checking for common paths.</p>
+
+<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete"><a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a></a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
+
+<p><strong>Update: </strong>Thanks to bmahler on reddit for pointing out that the wordlist approach was unnecessary and space inefficient. It has been corrected.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Vivek Narayanan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-25T17:48:00+05:30" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/algorithms/'>algorithms</a>, <a class='category' href='/blog/categories/python/'>python</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://vivekn.github.io/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/" data-via="_vivek_n" data-counturl="http://vivekn.github.io/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/12/30/travelling-santa-problem/" title="Next Post: The Travelling Santa Problem">The Travelling Santa Problem &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/12/30/travelling-santa-problem/">The Travelling Santa Problem</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/">Roll Your Own Autocomplete Solution Using Tries</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/vivekn">@vivekn</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'vivekn',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Vivek Narayanan -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
