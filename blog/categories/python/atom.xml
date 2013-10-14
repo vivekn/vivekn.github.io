@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: python | Vivek Narayanan's blog]]></title>
-  <link href="http://vivekn.github.io/blog/categories/python/atom.xml" rel="self"/>
-  <link href="http://vivekn.github.io/"/>
-  <updated>2013-10-14T18:35:06+05:30</updated>
-  <id>http://vivekn.github.io/</id>
+  <link href="http://vivekn.com/blog/categories/python/atom.xml" rel="self"/>
+  <link href="http://vivekn.com/"/>
+  <updated>2013-10-14T18:47:21+05:30</updated>
+  <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Roll your own autocomplete solution using Tries]]></title>
-    <link href="http://vivekn.github.io/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/"/>
+    <link href="http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/"/>
     <updated>2012-02-25T17:48:00+05:30</updated>
-    <id>http://vivekn.github.io/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries</id>
+    <id>http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries</id>
     <content type="html"><![CDATA[<p>You might have come across many websites with autocomplete suggestions, most notably Google.</p>
 
 <p><img src="http://storage.googleapis.com/support-kms-prod/SNP_67CE1E2EEBBDA24AC636DF84A911964629C8_3207874_en_v1" alt="Google Autocomplete" /></p>
