@@ -9,7 +9,7 @@
   <meta name="author" content="Vivek Narayanan">
 
   
-  <meta name="description" content="In this post I will describe a really simple algorithm for identifying trending items or posts in your application. TF &ndash; IDF (term frequency, &hellip;">
+  <meta name="description" content="After upgrading OSX to Yosemite, I noticed a sharp rise in battery usage in sleep mode. I usually close the lid, instead of shutting down and used to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,95 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/11/16/yosemite-battery-issues/">Yosemite Battery Issues.</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-11-16T19:29:00+05:30" pubdate data-updated="true">Nov 16<span>th</span>, 2014</time>
+        
+           | <a href="/blog/2014/11/16/yosemite-battery-issues/#disqus_thread"
+             data-disqus-identifier="http://vivekn.com/blog/2014/11/16/yosemite-battery-issues/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>After upgrading OSX to Yosemite, I noticed a sharp rise in battery usage in sleep mode. I usually close the lid, instead of shutting down and used to get a really good battery backup on my Air. But after the upgrade, I would lose about 30-40% of the charge overnight.</p>
+
+<p>So when you close the lid and your mac enters sleep mode, it is still running, only the displays have been turned off. After some time, memory is flushed to disk and it actually enters sleep mode. Turns out Apple have increased the delay for this to happen in the default configuration. To view your power management settings, use the command line tool <strong>pmset</strong>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>pmset -g
+</span><span class='line'>Active Profiles:
+</span><span class='line'>Battery Power     -1*
+</span><span class='line'>AC Power      -1
+</span><span class='line'>Currently in use:
+</span><span class='line'> standbydelay         10800
+</span><span class='line'> standby              1
+</span><span class='line'> halfdim              1
+</span><span class='line'> hibernatefile        /var/vm/sleepimage
+</span><span class='line'> darkwakes            0
+</span><span class='line'> disksleep            10
+</span><span class='line'> sleep                1
+</span><span class='line'> autopoweroffdelay    14400
+</span><span class='line'> hibernatemode        3
+</span><span class='line'> autopoweroff         1
+</span><span class='line'> ttyskeepawake        1
+</span><span class='line'> displaysleep         2
+</span><span class='line'> acwake               0
+</span><span class='line'> lidwake              1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So the problem here is that <strong>standbydelay</strong> is 10800 or 3 hours, so you laptop is essentially wasting power for three hours when it is in sleep mode. If it doesn&rsquo;t enter standby mode, it can immediately power up by just turning on the display, but it isn&rsquo;t worth it. So to reduce the <strong>standbydelay</strong> to 20 minutes use this command.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>pmset -a standbydelay 1200
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -647,6 +736,10 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/11/16/yosemite-battery-issues/">Yosemite Battery Issues.</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/09/20/an-algorithm-for-trending-topics/">An Algorithm for Trending Topics</a>
       </li>
     
@@ -660,10 +753,6 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
     
       <li class="post">
         <a href="/blog/2014/01/27/efficient-spelling-correction-using-bk-trees/">Efficient Spelling Correction Using BK Trees</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/05/the-trouble-with-svms/">The Trouble With SVMs</a>
       </li>
     
   </ul>
