@@ -34,5 +34,5 @@ Currently in use:
 So the problem here is that **standbydelay** is 10800 or 3 hours, so you laptop is essentially wasting power for three hours when it is in sleep mode. If it doesn't enter standby mode, it can immediately power up by just turning on the display, but it isn't worth it. So to reduce the **standbydelay** to 20 minutes use this command.
 
 {% codeblock lang:bash %}
-$ pmset -a standbydelay 1200 
+$ sudo pmset -a standbydelay 1200 
 {% endcodeblock %}
