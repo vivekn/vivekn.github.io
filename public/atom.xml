@@ -4,7 +4,7 @@
   <title><![CDATA[Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2014-11-16T19:35:30+05:30</updated>
+  <updated>2014-11-16T23:19:29+05:30</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -66,7 +66,7 @@
 <p>So the problem here is that <strong>standbydelay</strong> is 10800 or 3 hours, so you laptop is essentially wasting power for three hours when it is in sleep mode. If it doesn&rsquo;t enter standby mode, it can immediately power up by just turning on the display, but it isn&rsquo;t worth it. So to reduce the <strong>standbydelay</strong> to 20 minutes use this command.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>pmset -a standbydelay 1200
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pmset -a standbydelay 1200
 </span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
