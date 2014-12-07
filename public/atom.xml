@@ -4,7 +4,7 @@
   <title><![CDATA[Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2014-12-07T15:29:41+05:30</updated>
+  <updated>2014-12-07T23:18:19+05:30</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -60,7 +60,7 @@
 </span><span class='line'>    <span class="kn">from</span> <span class="nn">urllib2</span> <span class="kn">import</span> <span class="n">urlopen</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
-</span><span class='line'>      <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;/tmp/download&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;/tmp/download&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
 </span><span class='line'>      <span class="n">body</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 </span><span class='line'>      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
 </span><span class='line'>      <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>

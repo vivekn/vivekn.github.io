@@ -35,7 +35,7 @@ Call `tasks.main()` to get the interactive command line options.
     from urllib2 import urlopen
     
     def fetch(url):
-    	f = open('/tmp/download')
+    	f = open('/tmp/download', 'w')
     	body = urlopen(url).read()
     	f.write(body)
     	f.close()
