@@ -9,7 +9,7 @@
   <meta name="author" content="Vivek Narayanan">
 
   
-  <meta name="description" content="After upgrading OSX to Yosemite, I noticed a sharp rise in battery usage in sleep mode. I usually close the lid, instead of shutting down and used to &hellip;">
+  <meta name="description" content="Python doesn&rsquo;t have a great reputation for executing concurrent or parallel code because of the global interpreter lock (GIL). Only one thread &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,121 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/12/07/quick-and-dirty-parallelism-in-python-with-tasks-dot-py/">Quick and Dirty Parallelism in Python With tasks.py</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-12-07T14:16:00+05:30" pubdate data-updated="true">Dec 7<span>th</span>, 2014</time>
+        
+           | <a href="/blog/2014/12/07/quick-and-dirty-parallelism-in-python-with-tasks-dot-py/#disqus_thread"
+             data-disqus-identifier="http://vivekn.com/blog/2014/12/07/quick-and-dirty-parallelism-in-python-with-tasks-dot-py/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Python doesn&rsquo;t have a great reputation for executing concurrent or parallel code because of the global interpreter lock (GIL). Only one thread of a process can execute python code at a time. But due to some excellent libraries like multiprocessing and eventlet, it is straightforward to get parallelism on all your sequential functions by just adding a couple of lines of code.</p>
+
+<p><a href="https://github.com/vivekn/tasks"><strong>tasks.py</strong></a> is a simple and fast task queue for executing multiple tasks in parallel. All you need to do is specify the task as a simple function that takes an argument and you get instant parallelism.</p>
+
+<p>It is ideal for executing multiple network bound tasks in parallel from a single node, like fetching a list of urls, crawling a site or making a lot of third party API calls, without going through the pain of setting up a map reduce cluster.</p>
+
+<h2>Installation</h2>
+
+<p>Since it uses <a href="http://redis.io">Redis</a> as a backend, install Redis and start the server. If you are already using redis, you can pass the custom connection object using the <code>tasks.set_redis</code> call.</p>
+
+<p>Install tasks_py</p>
+
+<pre><code>$ sudo pip install tasks_py
+</code></pre>
+
+<h2> Usage</h2>
+
+<p>A task is a function that takes a single string argument. Define such a function and register it using <code>tasks.set_func</code> . If the function raises an exception, it is considered to have failed.</p>
+
+<p>Call <code>tasks.main()</code> to get the interactive command line options.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'>    <span class="kn">import</span> <span class="nn">eventlet</span>
+</span><span class='line'>    <span class="n">eventlet</span><span class="o">.</span><span class="n">monkey_patch</span><span class="p">()</span>
+</span><span class='line'>    <span class="kn">import</span> <span class="nn">tasks</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kn">from</span> <span class="nn">urllib2</span> <span class="kn">import</span> <span class="n">urlopen</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+</span><span class='line'>      <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;/tmp/download&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">body</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span><span class='line'>      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span class='line'>      
+</span><span class='line'>    <span class="n">tasks</span><span class="o">.</span><span class="n">set_func</span><span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">tasks</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that it is important to import eventlet and call <code>monkey_patch</code> to replace the blocking network calls with asynchronous IO from eventlet.</p>
+
+<p>Now to add jobs, create a file with one argument per line and use this command.</p>
+
+<p><code>$ python yourfile.py add &lt;list_of_jobs.txt&gt;</code></p>
+
+<p>To start (or restart) the job processing (do this in a <strong>screen</strong> session or close the input stream):</p>
+
+<p><code>$ python yourfile.py run</code></p>
+
+<p><strong>tasks</strong> has resume support, so it will start where you left off the last time.</p>
+
+<p>To view the current status while it is running:</p>
+
+<p><code>$ python yourfile.py status</code></p>
+
+<p>Once you are done, you can clear the logs and the completed tasks by calling reset.</p>
+
+<p><code>$ python yourfile.py reset</code></p>
+
+<h2>How it works</h2>
+
+<p>It uses a <strong>multiprocessing</strong> pool to distribute tasks across multiple processes and hence bypasses the GIL. Even with multiple processes, there is a problem as most of the time will be spent blocked on a network request. Here is where, <strong>eventlet</strong> comes in to the picture, each process has an IO loop and a number of coroutines or &ldquo;green threads&rdquo;.  A green thread is similar to a thread but it is lightweight and has very less overhead. A single green thread runs at a time, but whenever a green thread is waiting on I/O or network, the IO loop switches the thread out and a different green thread is executed. It is a non blocking approach that scales very well.</p>
+
+<p>The code is available on <a href="https://github.com/vivekn/tasks">Github</a>. Feel free to fork and modify this.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -736,6 +851,10 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/12/07/quick-and-dirty-parallelism-in-python-with-tasks-dot-py/">Quick and Dirty Parallelism in Python With tasks.py</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/11/16/yosemite-battery-issues/">Yosemite Battery Issues.</a>
       </li>
     
@@ -749,10 +868,6 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
     
       <li class="post">
         <a href="/blog/2014/04/07/writing-a-web-server-from-scratch/">Writing a Web Server From Scratch - 1</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/27/efficient-spelling-correction-using-bk-trees/">Efficient Spelling Correction Using BK Trees</a>
       </li>
     
   </ul>
