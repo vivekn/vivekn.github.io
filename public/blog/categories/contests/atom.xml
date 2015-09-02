@@ -4,7 +4,7 @@
   <title><![CDATA[Category: contests | Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/blog/categories/contests/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2014-12-07T23:18:19+05:30</updated>
+  <updated>2015-09-02T17:28:40-04:00</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[The Travelling Santa Problem]]></title>
     <link href="http://vivekn.com/blog/2012/12/30/travelling-santa-problem/"/>
-    <updated>2012-12-30T17:48:00+05:30</updated>
+    <updated>2012-12-30T17:48:00-05:00</updated>
     <id>http://vivekn.com/blog/2012/12/30/travelling-santa-problem</id>
     <content type="html"><![CDATA[<p>I spent the past couple of days on a problem called the &ldquo;Travelling Santa Problem&rdquo;, a variant of the NP complete &ldquo;<a href="en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling Salesman Problem</a>&rdquo;. There is an ongoing competition on Kaggle, a site which hosts various machine learning and optimization contests. In the original TSP problem you need to find a tour of a graph, visiting every vertex exactly once, minimizing the total cost. Since there can be an arbitrarily large (exponential in number of vertices) number of such paths (Hamiltonian cycles), no polynomial time exact algorithm is known for this problem. Applications of TSP are in the areas of scheduling, logistics and implementation of electronic circuitry. Kaggle&rsquo;s <a href="http://www.kaggle.com/c/traveling-santa-problem">version</a> of the problem gives you a set of 150000 points on a two dimensional plane, and you need to find two paths, that visit all the points and have no edges that are common to both the paths, ie, disjoint paths. The aim of the contest is to find the minimum distance and your score is the distance on the longer path.</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: python | Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2014-12-07T23:18:19+05:30</updated>
+  <updated>2015-09-02T17:28:40-04:00</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -14,103 +14,9 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Quick and dirty parallelism in Python with tasks.py]]></title>
-    <link href="http://vivekn.com/blog/2014/12/07/quick-and-dirty-parallelism-in-python-with-tasks-dot-py/"/>
-    <updated>2014-12-07T14:16:00+05:30</updated>
-    <id>http://vivekn.com/blog/2014/12/07/quick-and-dirty-parallelism-in-python-with-tasks-dot-py</id>
-    <content type="html"><![CDATA[<p>Python doesn&rsquo;t have a great reputation for executing concurrent or parallel code because of the global interpreter lock (GIL). Only one thread of a process can execute python code at a time. But due to some excellent libraries like multiprocessing and eventlet, it is straightforward to get parallelism on all your sequential functions by just adding a couple of lines of code.</p>
-
-<p><a href="https://github.com/vivekn/tasks"><strong>tasks.py</strong></a> is a simple and fast task queue for executing multiple tasks in parallel. All you need to do is specify the task as a simple function that takes an argument and you get instant parallelism.</p>
-
-<p>It is ideal for executing multiple network bound tasks in parallel from a single node, like fetching a list of urls, crawling a site or making a lot of third party API calls, without going through the pain of setting up a map reduce cluster.</p>
-
-<h2>Installation</h2>
-
-<p>Since it uses <a href="http://redis.io">Redis</a> as a backend, install Redis and start the server. If you are already using redis, you can pass the custom connection object using the <code>tasks.set_redis</code> call.</p>
-
-<p>Install tasks_py</p>
-
-<pre><code>$ sudo pip install tasks_py
-</code></pre>
-
-<h2> Usage</h2>
-
-<p>A task is a function that takes a single string argument. Define such a function and register it using <code>tasks.set_func</code> . If the function raises an exception, it is considered to have failed.</p>
-
-<p>Call <code>tasks.main()</code> to get the interactive command line options.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kn">import</span> <span class="nn">eventlet</span>
-</span><span class='line'><span class="n">eventlet</span><span class="o">.</span><span class="n">monkey_patch</span><span class="p">()</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">tasks</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">from</span> <span class="nn">urllib2</span> <span class="kn">import</span> <span class="n">urlopen</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;/tmp/download&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">body</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-</span><span class='line'>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">tasks</span><span class="o">.</span><span class="n">set_func</span><span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
-</span><span class='line'><span class="n">tasks</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Note that it is important to import eventlet and call <code>monkey_patch</code> to replace the blocking network calls with asynchronous IO from eventlet.</p>
-
-<p>Now to add jobs, create a file with one argument per line and use this command.</p>
-
-<p><code>$ python yourfile.py add &lt;list_of_jobs.txt&gt;</code></p>
-
-<p>To start (or restart) the job processing (do this in a <strong>screen</strong> session or close the input stream):</p>
-
-<p><code>$ python yourfile.py run</code></p>
-
-<p><strong>tasks</strong> has resume support, so it will start where you left off the last time.</p>
-
-<p>To view the current status while it is running:</p>
-
-<p><code>$ python yourfile.py status</code></p>
-
-<p>Once you are done, you can clear the logs and the completed tasks by calling reset.</p>
-
-<p><code>$ python yourfile.py reset</code></p>
-
-<h2>How it works</h2>
-
-<p>It uses a <strong>multiprocessing</strong> pool to distribute tasks across multiple processes and hence bypasses the GIL. Even with multiple processes, there is a problem as most of the time will be spent blocked on a network request. Here is where, <strong>eventlet</strong> comes in to the picture, each process has an IO loop and a number of coroutines or &ldquo;green threads&rdquo;.  A green thread is similar to a thread but it is lightweight and has very less overhead. A single green thread runs at a time, but whenever a green thread is waiting on I/O or network, the IO loop switches the thread out and a different green thread is executed. It is a non blocking approach that scales very well.</p>
-
-<p>The code is available on <a href="https://github.com/vivekn/tasks">Github</a>. Feel free to fork and modify this.</p>
-]]></content>
-  </entry>
-  
-  <entry>
     <title type="html"><![CDATA[Roll your own autocomplete solution using Tries]]></title>
     <link href="http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/"/>
-    <updated>2012-02-25T17:48:00+05:30</updated>
+    <updated>2012-02-25T17:48:00-05:00</updated>
     <id>http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries</id>
     <content type="html"><![CDATA[<p>You might have come across many websites with autocomplete suggestions, most notably Google.</p>
 
