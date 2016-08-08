@@ -4,7 +4,7 @@
   <title><![CDATA[Category: machine-learning | Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/blog/categories/machine-learning/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2016-08-07T19:20:05-07:00</updated>
+  <updated>2016-08-07T19:32:20-07:00</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -54,44 +54,6 @@
   <li>Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992</li>
   <li>Zaremba, Wojciech, and Ilya Sutskever. “Reinforcement Learning Neural Turing Machines-Revised.” arXiv preprint arXiv:1505.00521 (2015).</li>
 </ul>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[An algorithm for trending topics]]></title>
-    <link href="http://vivekn.com/blog/2014/09/20/an-algorithm-for-trending-topics/"/>
-    <updated>2014-09-20T23:04:00-07:00</updated>
-    <id>http://vivekn.com/blog/2014/09/20/an-algorithm-for-trending-topics</id>
-    <content type="html"><![CDATA[<p>In this post I will describe a really simple algorithm for identifying trending items or posts in your application. TF - IDF (term frequency, inverse document frequency) is a technique that was used to rank search results in early search engines.</p>
-
-<p>Assume that you have a large corpus of text documents and want to search a document containing a certain phrase or set of keywords. With TF-IDF, you need to calculate two quantities for each keyword :-
-1. term frequency - the number of times the keyword appears in a particular document.
-2. inverse document frequency - the inverse of the number of documents containing the keyword.</p>
-
-<p>For each document sum up the TF-IDF values of each of the keywords in the query and then rank them. The reason this works is because the IDF part of it helps filter out common words that are present in tons of documents. So a document containing a rare term is given more weight in the search results. Why term frequency is needed is much more obvious as a document containing more occurrences of a keyword is more likely to be the document you are looking for.</p>
-
-<p>Now, we can extend this algorithm for identifying trending items in a dataset. First, partition the data into two sets, one the target data set containing posts/items in the timeframe/geography for which you want to find the trending items and the rest of the data. Some preprocessing like removing stop words and stripping punctuation would be useful. Now for each of the terms in the target set, find its TF-IDF score and rank the terms. In this case the term frequency will be the number of occurrences in the target set and the IDF will be the number of documents in which the term appears in the other set. Instead of doing this exercise for each and every term, you may also do this on tags/hashtags to save memory usage.</p>
-
-<p>Here is an example script on a dataset containing tweets:</p>
-
-<script src="https://gist.github.com/vivekn/9dfd1f23ce111b12c8ef.js"></script>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Trouble with SVMs]]></title>
-    <link href="http://vivekn.com/blog/2013/04/05/the-trouble-with-svms/"/>
-    <updated>2013-04-05T17:48:00-07:00</updated>
-    <id>http://vivekn.com/blog/2013/04/05/the-trouble-with-svms</id>
-    <content type="html"><![CDATA[<p>People tend to use complicated machine learning models like support vector machines, just because it is believed to be the model with the best accuracy. The fact that SVMs are available as black box implementations exacerbate this problem. I would suggest focusing on your data instead of using slow techniques that you only partially understand. I achieved better results with a simple Naive Bayes classifier by choosing the right features. The best part is it only takes as much time as it does to read the document unlike an SVM.</p>
-<p>I had a task of classifying text documents or reviews for sentiment polarity for a college project. I had a dataset of over 50,000 movie reviews with 25,000 positive and 25,000 negative reviews. After dividing my data into training and test data, the first thing I came up with was a Naive Bayes classifier based on the word frequencies of each term in the text. I used add one (or Laplacian) smoothing to handle words which were not in the training set. With this, the accuracy was around 69%. That is bad and is only marginally better than random guessing. I added a mechanism to transfer words to the opposite class when they were negated. That is to say if there is a word like "not" followed by some other word, the other word is placed in the opposite class. This along with Multinomial Naive Bayes, i.e counting a word only once in a document, helped increase the accuracy to 82.4%.</p>
-<p>Then, against my better judgement I decided to try an SVM without completely understanding how it works. I used the TinySVM library and the training took over 45 minutes (vs 1 minute for NB) and resulted in a measly improvement of 0.3%. Not convinced by the black box approach, I decided to learn more about SVMs. The first place I went to were Andrew Ng's lectures on Youtube. They helped me gain a general intuition about how an SVM works but the treatment of math was more hand wavy and it didn't have anything about the actual algorithm to implement it. The papers on SVMs and SMO (Sequential Minimal Optimization) were too dense and the math was way above my level as I knew nothing about convex optimization. I spent part of the next month watching Stephen Boyd's convex optimization lectures. Now I understood about Lagrange multipliers and KKT conditions but the task of implementing an SVM was too daunting. I realized that it may take a few months to write one from scratch. What a waste of time!</p>
-<p>Now, I thought of removing the features that were only contributing noise to the classifiers. Stop word removal came to my mind but there were research papers suggesting that it actually removes information relevant to sentiment. Mutual information can be used quite effectively for feature selection. It is a measure of correlation of a feature with the whole dataset. Since it was based on probabilities, it suited my Naive Bayes model very well. So I reduced the number of features from over 300,000 words to 6,000. I chose this number by plotting a graph of the accuracy v/s the number of features. The accuracy shot up to 85.2% and the training time was still under a minute.&nbsp;</p>
-<p>The fact that I could throw away irrelevant features meant I could initially define a very large number of features and then prune the irrelevant ones. So I added bigrams and trigrams as additional features. The feature space had now increased to 11 million. By selecting the top 32,000 features by mutual information, I was able to get an accuracy of 88.89%. There was a <a href="http://ai.stanford.edu/~amaas/papers/wvSent_acl2011.pdf">paper</a> by Andrew Maas of Stanford achieving an accuracy of 88.89% using complicated vector space and probability models on the same dataset. Naive Bayes comes within 0.1% of that.</p>
-<p>The lesson from this is that you can achieve a lot using a very simple algorithm, if you&nbsp;focus on selecting the right features for your data. No need to resort to complex black box models.</p>
-
-<p> <a href="http://sentiment.vivekn.com"> Here </a> is a link to the sentiment analyzer to play around with. </p>
 ]]></content>
   </entry>
   
