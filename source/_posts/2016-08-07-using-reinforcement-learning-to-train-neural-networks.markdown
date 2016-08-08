@@ -38,6 +38,9 @@ $$
 
 <p>We can approximate this gradient computation as follows: start by sampling an action $a_1$ from the policy and observe the rewards. Continue sampling $a_{t} | a_{1:t-1}$  according to the policy and finally backpropagate the sum of rewards to the network. We can have the network output the log probabilities $\log p_\theta(a_t | a_{1:t-1})$ at each time step for each action, which can be used to sample the next action. And since we already know how to compute the gradients for the network, we can use this model to train a neural net which to optimize for a  score function that is not necessarily differentiable.</p>
 
+<p> But this algorithm can be slow to converge for very large action spaces like text generation, so it is better to pretrain the model with a cross entropy loss and then slowly introduce the REINFORCE step with an annealing schedule. That is, you alternate between REINFORCE and cross entropy training, slowly increasing the proportion of REINFORCE iterations.  </p>
+
+
 References
 -----
   * Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992
