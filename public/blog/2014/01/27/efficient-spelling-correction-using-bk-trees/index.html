@@ -30,6 +30,22 @@
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [ ['$', '$'], ["\(", "\)"] ],
+        displayMath: [ ['$$', '$$'], ["\[", "\]"] ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+      //,
+      //displayAlign: "left",
+      //displayIndent: "2em"
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -68,7 +84,6 @@
 <ul class="main-navigation">
   <li><a href="/">Blog</a></li>
   <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="http://sentiment.vivekn.com">Sentiment Analysis Tool</a></li>
 </ul>
 
 </nav>
@@ -95,7 +110,7 @@
   
 
 
-<time datetime="2014-01-27T22:14:00-05:00" pubdate data-updated="true">Jan 27<span>th</span>, 2014</time>
+<time datetime="2014-01-27T22:14:00-08:00" pubdate data-updated="true">Jan 27<span>th</span>, 2014</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://vivekn.com">Comments</a>
@@ -107,7 +122,7 @@
 
 <div class="entry-content"><p>I came across an interesting data structure called the BK Tree today. It is useful in coming up with suggestions for spelling correction from a dictionary.</p>
 
-<p>A simple solution for coming up with spelling corrections would be to iterate through all the words in the dictionary and computing the Levenshtein distance with the search term and filtering those words less than some bound. But this would have a complexity of <strong>O(n * m<sup>2</sup>)</strong> where <strong>n</strong> is the number of words and <strong>m</strong>, the average length. But words are not randomly distributed across the alphabet space, hence a large number of these computations are useless. The idea behind the BK tree is to construct a k-ary tree, such that only nodes that are within a particular edit distance are searched. This exploits the fact that the Levenshtein distance forms a metric space. A really nice explanation of constructing and searching through a BK tree is given <a href="http://nullwords.wordpress.com/2013/03/13/the-bk-tree-a-data-structure-for-spell-checking/">here</a>. It is not necessary that the metric used should be Levenshtein distance, you can use any other metric as you see fit.</p>
+<p>A simple solution for coming up with spelling corrections would be to iterate through all the words in the dictionary and computing the Levenshtein distance with the search term and filtering those words less than some bound. But this would have a complexity of <strong>O(n * m^2)</strong> where <strong>n</strong> is the number of words and <strong>m</strong>, the average length. But words are not randomly distributed across the alphabet space, hence a large number of these computations are useless. The idea behind the BK tree is to construct a k-ary tree, such that only nodes that are within a particular edit distance are searched. This exploits the fact that the Levenshtein distance forms a metric space. A really nice explanation of constructing and searching through a BK tree is given <a href="http://nullwords.wordpress.com/2013/03/13/the-bk-tree-a-data-structure-for-spell-checking/">here</a>. It is not necessary that the metric used should be Levenshtein distance, you can use any other metric as you see fit.</p>
 
 <p>It has been observed that for edit distance 2, using a BK tree you need to search only 5-10% of the nodes of the tree. I hacked up a BK Tree <a href="https://github.com/vivekn/autocorrect">implementation</a> in Scala, and was able to load the <code>/usr/share/dict/words</code> file which contains about 250k words in 5 seconds on my MacBook Air. A search query with edit distance 2 takes about 0.06 seconds. Still, I feel there is room for improvement on the performance front. Suggestions welcome.</p>
 
@@ -135,7 +150,7 @@
   
 
 
-<time datetime="2014-01-27T22:14:00-05:00" pubdate data-updated="true">Jan 27<span>th</span>, 2014</time>
+<time datetime="2014-01-27T22:14:00-08:00" pubdate data-updated="true">Jan 27<span>th</span>, 2014</time>
       
 
 
@@ -177,58 +192,22 @@
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
     
+      
       <li class="post">
-        <a href="/blog/2014/11/16/yosemite-battery-issues/">Yosemite Battery Issues.</a>
+        <a href="/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/">Using Reinforcement Learning to Train Neural Networks.</a>
       </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/09/20/an-algorithm-for-trending-topics/">An Algorithm for Trending Topics</a>
-      </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/04/26/writing-a-web-server-from-scratch-part-2/">Writing a Web Server From Scratch - 2</a>
-      </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/04/07/writing-a-web-server-from-scratch/">Writing a Web Server From Scratch - 1</a>
-      </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/01/27/efficient-spelling-correction-using-bk-trees/">Efficient Spelling Correction Using BK Trees</a>
-      </li>
+      
     
   </ul>
 </section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating...</li>
-  </ul>
-  
-  <a href="https://github.com/vivekn">@vivekn</a> on GitHub
-  
-  <script type="text/javascript">
-    $(document).ready(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'vivekn',
-            count: 5,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
 
 
 
@@ -240,7 +219,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Vivek Narayanan -
+  Copyright &copy; 2016 - Vivek Narayanan -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: python | Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2015-09-02T17:41:36-04:00</updated>
+  <updated>2016-08-07T18:46:08-07:00</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Roll your own autocomplete solution using Tries]]></title>
     <link href="http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/"/>
-    <updated>2012-02-25T17:48:00-05:00</updated>
+    <updated>2012-02-25T17:48:00-08:00</updated>
     <id>http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries</id>
     <content type="html"><![CDATA[<p>You might have come across many websites with autocomplete suggestions, most notably Google.</p>
 
@@ -32,37 +32,32 @@
 <li>The children at each node are ideally represented using a hash table mapping the next character to the child nodes.</li>&#13;
 <li>Its also useful to set a flag at every node to indicate whether a word/phrase ends there.</li>&#13;
 </ol>
-
-
 <p>Now we can define methods to insert a string and to search for one.</p>
 
 <script src="https://gist.github.com/1906905.js?file=trie.py"></script>
 
-
-<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node&rsquo;s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
+<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node’s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
 
 <script src="https://gist.github.com/1906922.js?file=trie.py"></script>
 
-
 <p>To delete an item,  first traverse down to the leaf of the keyword and then work backwards, checking for common paths.</p>
 
-<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete"><a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a></a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
+<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
 
 <p><strong>Update: </strong>Thanks to bmahler on reddit for pointing out that the wordlist approach was unnecessary and space inefficient. It has been corrected.</p>
 
 <div style="display: none;">
-    trie data structure <br>
-    trie algorithm <br>
-    trie autocomplete <br>
-    autocomplete <br>
-    autosuggest <br>
-    autocomplete algorithm<br>
-    autosuggest algorithm<br>
-    trie implementation <br>
-    input autocomplete <br>
-    autocomplete algorithm <br>
+	trie data structure <br />
+	trie algorithm <br />
+	trie autocomplete <br />
+	autocomplete <br />
+	autosuggest <br />
+	autocomplete algorithm<br />
+	autosuggest algorithm<br />
+	trie implementation <br />
+	input autocomplete <br />
+	autocomplete algorithm <br />
 </div>
-
 ]]></content>
   </entry>
   

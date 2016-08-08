@@ -1,0 +1,44 @@
+---
+layout: post
+title: "Using reinforcement learning to train neural networks."
+date: 2016-08-07 18:23
+comments: true
+categories: machine-learning
+---
+<p>A common theme with several machine learning tasks that involve sequences is that you need to generate a sequence one term at a time. Examples are any kind of text generation, image captioning, time series predictions, machine translation, or a task where you have to make a sequence of decisions and you get reward signals only once in a while. Ideally we would want to maximize a score that takes the entire sequence into account. But it is hard to backpropagate these scores, as they usually tend to be non differentiable. So we have to resort to something like using a cross entropy loss for each term in the sequence. This isn't great because it allows for errors to accumulate at each step during prediction time, as we are using the previous prediction as an input.</p>
+
+One way of approaching this problem is to use the non differentiable rewards/scores that take into account the whole sequence by applying the REINFORCE algorithm. For this we need to treat the neural network as a reinforcement learning agent. For example, the hidden state of an RNN can be the state of the agent and an action can be predicting the next term in the sequence. A score associated with generating a sequence according to the goal of the task is a reward.
+
+The REINFORCE algorithm
+----
+
+<p> The setting is as follows: we have an agent that can take actions from a set $A$. Let $a_t$ denote the action it takes at time $t$. It samples an action according to a probability distribution $p_\theta(a_t | a_{1:t-1})$. It might get a reward $r(a_{1:t})$ at each time step. And the episode terminates at some variable length $T$, if the reward takes the whole sequence into account, $r(a_{1:T})$ might be the only reward in the episode. So, the goal here is to maximize the expected future reward $J(\theta)$. Let $\mathcal{A}$ be the set of all sequences of actions that terminate.  </p>
+
+
+$$
+\begin{align}
+    \text{Let, } R(a_{1:T}) &= \sum_{t=1}^{T} r(a_{1:T})\\
+    J(\theta) &= \sum_{a_{1:T} \in \mathcal{A}} p_\theta(a_{1:T}) R(a_{1:T})
+\end{align}
+$$
+
+
+<p>Since we want to maximize $J(\theta)$, we are interested in its gradient, which can be written as an expectation.</p>
+
+
+$$
+\begin{align}
+    \frac{\partial J(\theta)}{ \partial \theta} &=
+    \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{1}{p_\theta(a_{1:T})}\frac{\partial p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \mathbb{E}_{a_{1:T} \sim p_{\theta}} \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \mathbb{E}_{a_1 \sim p_{\theta}(a_1)} \mathbb{E}_{a_2 \sim p_{\theta}(a_2|a_1)} ... \mathbb{E}_{a_n \sim p_{\theta}(a_T | a_{1:T-1})} \sum_{t=1}^{T}  \frac{\partial \log p_\theta(a_t | a_{1:t-1}) }{  \partial \theta} R(a_{1:T}) \\
+\end{align}
+$$
+
+<p>We can approximate this gradient computation as follows: start by sampling an action $a_1$ from the policy and observe the rewards. Continue sampling $a_{t} | a_{1:t-1}$  according to the policy and finally backpropagate the sum of rewards to the network. We can have the network output the log probabilities $\log p_\theta(a_t | a_{1:t-1})$ at each time step for each action, which can be used to sample the next action. And since we already know how to compute the gradients for the network, we can use this model to train a neural net which to optimize for a  score function that is not necessarily differentiable.</p>
+
+References
+-----
+  * Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992
+  * Zaremba, Wojciech, and Ilya Sutskever. "Reinforcement Learning Neural Turing Machines-Revised." arXiv preprint arXiv:1505.00521 (2015).

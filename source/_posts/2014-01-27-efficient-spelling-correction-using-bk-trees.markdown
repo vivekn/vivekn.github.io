@@ -3,7 +3,9 @@ layout: post
 title: "Efficient spelling correction using BK Trees"
 date: 2014-01-27 22:14
 comments: true
-categories: 
+categories:
+draft: true
+
 ---
 
 I came across an interesting data structure called the BK Tree today. It is useful in coming up with suggestions for spelling correction from a dictionary.

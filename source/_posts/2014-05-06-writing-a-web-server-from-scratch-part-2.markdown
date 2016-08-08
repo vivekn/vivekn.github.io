@@ -4,6 +4,7 @@ title: "Writing a web server from scratch - 2"
 date: 2014-04-26 21:33
 comments: true
 categories: unix
+draft: true
 ---
 <p>Over the past few days I spent some time writing a web server and it has been very gratifying and I learnt about quite a few things. So let me start off with the design, the thing about web servers is that its quite simple to implement the core functionality but the bulk of it is the plumbing work around parsing the different rules of the HTTP protocol, which I&rsquo;ve kept it to the bare minimum as modern browsers have sane defaults.</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: machine-learning | Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/blog/categories/machine-learning/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2015-09-02T17:41:36-04:00</updated>
+  <updated>2016-08-07T18:46:08-07:00</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -14,15 +14,59 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Using reinforcement learning to train neural networks.]]></title>
+    <link href="http://vivekn.com/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/"/>
+    <updated>2016-08-07T18:23:00-07:00</updated>
+    <id>http://vivekn.com/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks</id>
+    <content type="html"><![CDATA[<p>A common theme with several machine learning tasks that involve sequences is that you need to generate a sequence one term at a time. Examples are any kind of text generation, image captioning, time series predictions, machine translation, or a task where you have to make a sequence of decisions and you get reward signals only once in a while. Ideally we would want to maximize a score that takes the entire sequence into account. But it is hard to backpropagate these scores, as they usually tend to be non differentiable. So we have to resort to something like using a cross entropy loss for each term in the sequence. This isn't great because it allows for errors to accumulate at each step during prediction time, as we are using the previous prediction as an input.</p>
+
+<p>One way of approaching this problem is to use the non differentiable rewards/scores that take into account the whole sequence by applying the REINFORCE algorithm. For this we need to treat the neural network as a reinforcement learning agent. For example, the hidden state of an RNN can be the state of the agent and an action can be predicting the next term in the sequence. A score associated with generating a sequence according to the goal of the task is a reward.</p>
+
+<h2 id="the-reinforce-algorithm">The REINFORCE algorithm</h2>
+
+<p> The setting is as follows: we have an agent that can take actions from a set $A$. Let $a_t$ denote the action it takes at time $t$. It samples an action according to a probability distribution $p_\theta(a_t | a_{1:t-1})$. It might get a reward $r(a_{1:t})$ at each time step. And the episode terminates at some variable length $T$, if the reward takes the whole sequence into account, $r(a_{1:T})$ might be the only reward in the episode. So, the goal here is to maximize the expected future reward $J(\theta)$. Let $\mathcal{A}$ be the set of all sequences of actions that terminate.  </p>
+
+<script type="math/tex; mode=display">% &lt;![CDATA[
+
+\begin{align}
+    \text{Let, } R(a_{1:T}) &= \sum_{t=1}^{T} r(a_{1:T})\\
+    J(\theta) &= \sum_{a_{1:T} \in \mathcal{A}} p_\theta(a_{1:T}) R(a_{1:T})
+\end{align}
+ %]]&gt;</script>
+
+<p>Since we want to maximize $J(\theta)$, we are interested in its gradient, which can be written as an expectation.</p>
+
+<script type="math/tex; mode=display">% &lt;![CDATA[
+
+\begin{align}
+    \frac{\partial J(\theta)}{ \partial \theta} &=
+    \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{1}{p_\theta(a_{1:T})}\frac{\partial p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \mathbb{E}_{a_{1:T} \sim p_{\theta}} \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \mathbb{E}_{a_1 \sim p_{\theta}(a_1)} \mathbb{E}_{a_2 \sim p_{\theta}(a_2|a_1)} ... \mathbb{E}_{a_n \sim p_{\theta}(a_T | a_{1:T-1})} \sum_{t=1}^{T}  \frac{\partial \log p_\theta(a_t | a_{1:t-1}) }{  \partial \theta} R(a_{1:T}) \\
+\end{align}
+ %]]&gt;</script>
+
+<p>We can approximate this gradient computation as follows: start by sampling an action $a_1$ from the policy and observe the rewards. Continue sampling $a_{t} | a_{1:t-1}$  according to the policy and finally backpropagate the sum of rewards to the network. We can have the network output the log probabilities $\log p_\theta(a_t | a_{1:t-1})$ at each time step for each action, which can be used to sample the next action. And since we already know how to compute the gradients for the network, we can use this model to train a neural net which to optimize for a  score function that is not necessarily differentiable.</p>
+
+<h2 id="references">References</h2>
+<ul>
+  <li>Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992</li>
+  <li>Zaremba, Wojciech, and Ilya Sutskever. “Reinforcement Learning Neural Turing Machines-Revised.” arXiv preprint arXiv:1505.00521 (2015).</li>
+</ul>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[An algorithm for trending topics]]></title>
     <link href="http://vivekn.com/blog/2014/09/20/an-algorithm-for-trending-topics/"/>
-    <updated>2014-09-20T23:04:00-04:00</updated>
+    <updated>2014-09-20T23:04:00-07:00</updated>
     <id>http://vivekn.com/blog/2014/09/20/an-algorithm-for-trending-topics</id>
-    <content type="html"><![CDATA[<p>In this post I will describe a really simple algorithm for identifying trending items or posts in your application. TF &ndash; IDF (term frequency, inverse document frequency) is a technique that was used to rank search results in early search engines.</p>
+    <content type="html"><![CDATA[<p>In this post I will describe a really simple algorithm for identifying trending items or posts in your application. TF - IDF (term frequency, inverse document frequency) is a technique that was used to rank search results in early search engines.</p>
 
-<p>Assume that you have a large corpus of text documents and want to search a document containing a certain phrase or set of keywords. With TF-IDF, you need to calculate two quantities for each keyword :&ndash;
-1. term frequency &ndash; the number of times the keyword appears in a particular document.
-2. inverse document frequency &ndash; the inverse of the number of documents containing the keyword.</p>
+<p>Assume that you have a large corpus of text documents and want to search a document containing a certain phrase or set of keywords. With TF-IDF, you need to calculate two quantities for each keyword :-
+1. term frequency - the number of times the keyword appears in a particular document.
+2. inverse document frequency - the inverse of the number of documents containing the keyword.</p>
 
 <p>For each document sum up the TF-IDF values of each of the keywords in the query and then rank them. The reason this works is because the IDF part of it helps filter out common words that are present in tons of documents. So a document containing a rare term is given more weight in the search results. Why term frequency is needed is much more obvious as a document containing more occurrences of a keyword is more likely to be the document you are looking for.</p>
 
@@ -38,30 +82,16 @@
   <entry>
     <title type="html"><![CDATA[The Trouble with SVMs]]></title>
     <link href="http://vivekn.com/blog/2013/04/05/the-trouble-with-svms/"/>
-    <updated>2013-04-05T17:48:00-04:00</updated>
+    <updated>2013-04-05T17:48:00-07:00</updated>
     <id>http://vivekn.com/blog/2013/04/05/the-trouble-with-svms</id>
     <content type="html"><![CDATA[<p>People tend to use complicated machine learning models like support vector machines, just because it is believed to be the model with the best accuracy. The fact that SVMs are available as black box implementations exacerbate this problem. I would suggest focusing on your data instead of using slow techniques that you only partially understand. I achieved better results with a simple Naive Bayes classifier by choosing the right features. The best part is it only takes as much time as it does to read the document unlike an SVM.</p>
-
-
 <p>I had a task of classifying text documents or reviews for sentiment polarity for a college project. I had a dataset of over 50,000 movie reviews with 25,000 positive and 25,000 negative reviews. After dividing my data into training and test data, the first thing I came up with was a Naive Bayes classifier based on the word frequencies of each term in the text. I used add one (or Laplacian) smoothing to handle words which were not in the training set. With this, the accuracy was around 69%. That is bad and is only marginally better than random guessing. I added a mechanism to transfer words to the opposite class when they were negated. That is to say if there is a word like "not" followed by some other word, the other word is placed in the opposite class. This along with Multinomial Naive Bayes, i.e counting a word only once in a document, helped increase the accuracy to 82.4%.</p>
-
-
 <p>Then, against my better judgement I decided to try an SVM without completely understanding how it works. I used the TinySVM library and the training took over 45 minutes (vs 1 minute for NB) and resulted in a measly improvement of 0.3%. Not convinced by the black box approach, I decided to learn more about SVMs. The first place I went to were Andrew Ng's lectures on Youtube. They helped me gain a general intuition about how an SVM works but the treatment of math was more hand wavy and it didn't have anything about the actual algorithm to implement it. The papers on SVMs and SMO (Sequential Minimal Optimization) were too dense and the math was way above my level as I knew nothing about convex optimization. I spent part of the next month watching Stephen Boyd's convex optimization lectures. Now I understood about Lagrange multipliers and KKT conditions but the task of implementing an SVM was too daunting. I realized that it may take a few months to write one from scratch. What a waste of time!</p>
-
-
 <p>Now, I thought of removing the features that were only contributing noise to the classifiers. Stop word removal came to my mind but there were research papers suggesting that it actually removes information relevant to sentiment. Mutual information can be used quite effectively for feature selection. It is a measure of correlation of a feature with the whole dataset. Since it was based on probabilities, it suited my Naive Bayes model very well. So I reduced the number of features from over 300,000 words to 6,000. I chose this number by plotting a graph of the accuracy v/s the number of features. The accuracy shot up to 85.2% and the training time was still under a minute.&nbsp;</p>
-
-
 <p>The fact that I could throw away irrelevant features meant I could initially define a very large number of features and then prune the irrelevant ones. So I added bigrams and trigrams as additional features. The feature space had now increased to 11 million. By selecting the top 32,000 features by mutual information, I was able to get an accuracy of 88.89%. There was a <a href="http://ai.stanford.edu/~amaas/papers/wvSent_acl2011.pdf">paper</a> by Andrew Maas of Stanford achieving an accuracy of 88.89% using complicated vector space and probability models on the same dataset. Naive Bayes comes within 0.1% of that.</p>
-
-
 <p>The lesson from this is that you can achieve a lot using a very simple algorithm, if you&nbsp;focus on selecting the right features for your data. No need to resort to complex black box models.</p>
 
-
-
-
 <p> <a href="http://sentiment.vivekn.com"> Here </a> is a link to the sentiment analyzer to play around with. </p>
-
 ]]></content>
   </entry>
   

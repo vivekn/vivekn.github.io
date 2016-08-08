@@ -30,6 +30,22 @@
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [ ['$', '$'], ["\(", "\)"] ],
+        displayMath: [ ['$$', '$$'], ["\[", "\]"] ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+      //,
+      //displayAlign: "left",
+      //displayIndent: "2em"
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -68,7 +84,6 @@
 <ul class="main-navigation">
   <li><a href="/">Blog</a></li>
   <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="http://sentiment.vivekn.com">Sentiment Analysis Tool</a></li>
 </ul>
 
 </nav>
@@ -95,7 +110,7 @@
   
 
 
-<time datetime="2012-02-25T17:48:00-05:00" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
+<time datetime="2012-02-25T17:48:00-08:00" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://vivekn.com">Comments</a>
@@ -119,37 +134,32 @@
 <li>The children at each node are ideally represented using a hash table mapping the next character to the child nodes.</li>&#13;
 <li>Its also useful to set a flag at every node to indicate whether a word/phrase ends there.</li>&#13;
 </ol>
-
-
 <p>Now we can define methods to insert a string and to search for one.</p>
 
 <script src="https://gist.github.com/1906905.js?file=trie.py"></script>
 
-
-<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node&rsquo;s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
+<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node’s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
 
 <script src="https://gist.github.com/1906922.js?file=trie.py"></script>
 
-
 <p>To delete an item,  first traverse down to the leaf of the keyword and then work backwards, checking for common paths.</p>
 
-<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete"><a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a></a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
+<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
 
 <p><strong>Update: </strong>Thanks to bmahler on reddit for pointing out that the wordlist approach was unnecessary and space inefficient. It has been corrected.</p>
 
 <div style="display: none;">
-    trie data structure <br>
-    trie algorithm <br>
-    trie autocomplete <br>
-    autocomplete <br>
-    autosuggest <br>
-    autocomplete algorithm<br>
-    autosuggest algorithm<br>
-    trie implementation <br>
-    input autocomplete <br>
-    autocomplete algorithm <br>
+	trie data structure <br />
+	trie algorithm <br />
+	trie autocomplete <br />
+	autocomplete <br />
+	autosuggest <br />
+	autocomplete algorithm<br />
+	autosuggest algorithm<br />
+	trie implementation <br />
+	input autocomplete <br />
+	autocomplete algorithm <br />
 </div>
-
 </div>
 
 
@@ -172,7 +182,7 @@
   
 
 
-<time datetime="2012-02-25T17:48:00-05:00" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
+<time datetime="2012-02-25T17:48:00-08:00" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
       
 
 <span class="categories">
@@ -218,58 +228,22 @@
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
     
+      
       <li class="post">
-        <a href="/blog/2014/11/16/yosemite-battery-issues/">Yosemite Battery Issues.</a>
+        <a href="/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/">Using Reinforcement Learning to Train Neural Networks.</a>
       </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/09/20/an-algorithm-for-trending-topics/">An Algorithm for Trending Topics</a>
-      </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/04/26/writing-a-web-server-from-scratch-part-2/">Writing a Web Server From Scratch - 2</a>
-      </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/04/07/writing-a-web-server-from-scratch/">Writing a Web Server From Scratch - 1</a>
-      </li>
+      
     
-      <li class="post">
-        <a href="/blog/2014/01/27/efficient-spelling-correction-using-bk-trees/">Efficient Spelling Correction Using BK Trees</a>
-      </li>
+      
     
   </ul>
 </section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating...</li>
-  </ul>
-  
-  <a href="https://github.com/vivekn">@vivekn</a> on GitHub
-  
-  <script type="text/javascript">
-    $(document).ready(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'vivekn',
-            count: 5,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
 
 
 
@@ -281,7 +255,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Vivek Narayanan -
+  Copyright &copy; 2016 - Vivek Narayanan -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

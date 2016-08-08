@@ -4,7 +4,7 @@
   <title><![CDATA[Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2015-09-02T17:41:36-04:00</updated>
+  <updated>2016-08-07T18:46:08-07:00</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -14,60 +14,103 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Yosemite battery issues.]]></title>
+    <title type="html"><![CDATA[Using reinforcement learning to train neural networks.]]></title>
+    <link href="http://vivekn.com/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/"/>
+    <updated>2016-08-07T18:23:00-07:00</updated>
+    <id>http://vivekn.com/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks</id>
+    <content type="html"><![CDATA[<p>A common theme with several machine learning tasks that involve sequences is that you need to generate a sequence one term at a time. Examples are any kind of text generation, image captioning, time series predictions, machine translation, or a task where you have to make a sequence of decisions and you get reward signals only once in a while. Ideally we would want to maximize a score that takes the entire sequence into account. But it is hard to backpropagate these scores, as they usually tend to be non differentiable. So we have to resort to something like using a cross entropy loss for each term in the sequence. This isn&#8217;t great because it allows for errors to accumulate at each step during prediction time, as we are using the previous prediction as an input.</p>
+
+<p>One way of approaching this problem is to use the non differentiable rewards/scores that take into account the whole sequence by applying the REINFORCE algorithm. For this we need to treat the neural network as a reinforcement learning agent. For example, the hidden state of an RNN can be the state of the agent and an action can be predicting the next term in the sequence. A score associated with generating a sequence according to the goal of the task is a reward.</p>
+
+<h2 id="the-reinforce-algorithm">The REINFORCE algorithm</h2>
+
+<p> The setting is as follows: we have an agent that can take actions from a set $A$. Let $a_t$ denote the action it takes at time $t$. It samples an action according to a probability distribution $p_\theta(a_t | a_{1:t-1})$. It might get a reward $r(a_{1:t})$ at each time step. And the episode terminates at some variable length $T$, if the reward takes the whole sequence into account, $r(a_{1:T})$ might be the only reward in the episode. So, the goal here is to maximize the expected future reward $J(\theta)$. Let $\mathcal{A}$ be the set of all sequences of actions that terminate.  </p>
+
+<script type="math/tex; mode=display">% &lt;![CDATA[
+
+\begin{align}
+    \text{Let, } R(a_{1:T}) &= \sum_{t=1}^{T} r(a_{1:T})\\
+    J(\theta) &= \sum_{a_{1:T} \in \mathcal{A}} p_\theta(a_{1:T}) R(a_{1:T})
+\end{align}
+ %]]&gt;</script>
+
+<p>Since we want to maximize $J(\theta)$, we are interested in its gradient, which can be written as an expectation.</p>
+
+<script type="math/tex; mode=display">% &lt;![CDATA[
+
+\begin{align}
+    \frac{\partial J(\theta)}{ \partial \theta} &=
+    \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{1}{p_\theta(a_{1:T})}\frac{\partial p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \mathbb{E}_{a_{1:T} \sim p_{\theta}} \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
+    &= \mathbb{E}_{a_1 \sim p_{\theta}(a_1)} \mathbb{E}_{a_2 \sim p_{\theta}(a_2|a_1)} ... \mathbb{E}_{a_n \sim p_{\theta}(a_T | a_{1:T-1})} \sum_{t=1}^{T}  \frac{\partial \log p_\theta(a_t | a_{1:t-1}) }{  \partial \theta} R(a_{1:T}) \\
+\end{align}
+ %]]&gt;</script>
+
+<p>We can approximate this gradient computation as follows: start by sampling an action $a_1$ from the policy and observe the rewards. Continue sampling $a_{t} | a_{1:t-1}$  according to the policy and finally backpropagate the sum of rewards to the network. We can have the network output the log probabilities $\log p_\theta(a_t | a_{1:t-1})$ at each time step for each action, which can be used to sample the next action. And since we already know how to compute the gradients for the network, we can use this model to train a neural net which to optimize for a  score function that is not necessarily differentiable.</p>
+
+<h2 id="references">References</h2>
+<ul>
+  <li>Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992</li>
+  <li>Zaremba, Wojciech, and Ilya Sutskever. “Reinforcement Learning Neural Turing Machines-Revised.” arXiv preprint arXiv:1505.00521 (2015).</li>
+</ul>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Yosemite battery issues]]></title>
     <link href="http://vivekn.com/blog/2014/11/16/yosemite-battery-issues/"/>
-    <updated>2014-11-16T19:29:00-05:00</updated>
+    <updated>2014-11-16T19:29:00-08:00</updated>
     <id>http://vivekn.com/blog/2014/11/16/yosemite-battery-issues</id>
     <content type="html"><![CDATA[<p>After upgrading OSX to Yosemite, I noticed a sharp rise in battery usage in sleep mode. I usually close the lid, instead of shutting down and used to get a really good battery life on my Air. But after the upgrade, I would lose about 30-40% of the charge overnight.</p>
 
 <p>So when you close the lid and your mac enters sleep mode, it is still running, only the displays have been turned off. After some time, memory is flushed to disk and it actually enters sleep mode. Turns out Apple have increased the delay for this to happen in the default configuration. To view your power management settings, use the command line tool <strong>pmset</strong>.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>pmset -g
-</span><span class='line'>Active Profiles:
-</span><span class='line'>Battery Power     -1*
-</span><span class='line'>AC Power      -1
-</span><span class='line'>Currently in use:
-</span><span class='line'> standbydelay         10800
-</span><span class='line'> standby              1
-</span><span class='line'> halfdim              1
-</span><span class='line'> hibernatefile        /var/vm/sleepimage
-</span><span class='line'> darkwakes            0
-</span><span class='line'> disksleep            10
-</span><span class='line'> sleep                1
-</span><span class='line'> autopoweroffdelay    14400
-</span><span class='line'> hibernatemode        3
-</span><span class='line'> autopoweroff         1
-</span><span class='line'> ttyskeepawake        1
-</span><span class='line'> displaysleep         2
-</span><span class='line'> acwake               0
-</span><span class='line'> lidwake              1
-</span></code></pre></td></tr></table></div></figure>
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nv">$ </span>pmset -g
+</span><span class="line">Active Profiles:
+</span><span class="line">Battery Power		-1*
+</span><span class="line">AC Power		-1
+</span><span class="line">Currently in use:
+</span><span class="line"> standbydelay         10800
+</span><span class="line"> standby              1
+</span><span class="line"> halfdim              1
+</span><span class="line"> hibernatefile        /var/vm/sleepimage
+</span><span class="line"> darkwakes            0
+</span><span class="line"> disksleep            10
+</span><span class="line"> sleep                1
+</span><span class="line"> autopoweroffdelay    14400
+</span><span class="line"> hibernatemode        3
+</span><span class="line"> autopoweroff         1
+</span><span class="line"> ttyskeepawake        1
+</span><span class="line"> displaysleep         2
+</span><span class="line"> acwake               0
+</span><span class="line"> lidwake              1
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>So the problem here is that <strong>standbydelay</strong> is 10800 or 3 hours, so you laptop is essentially wasting power for three hours when it is in sleep mode. If it doesn’t enter standby mode, it can immediately power up by just turning on the display, but it isn’t worth it. So to reduce the <strong>standbydelay</strong> to 20 minutes use this command.</p>
 
-<p>So the problem here is that <strong>standbydelay</strong> is 10800 or 3 hours, so you laptop is essentially wasting power for three hours when it is in sleep mode. If it doesn&rsquo;t enter standby mode, it can immediately power up by just turning on the display, but it isn&rsquo;t worth it. So to reduce the <strong>standbydelay</strong> to 20 minutes use this command.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pmset -a standbydelay 1200
-</span></code></pre></td></tr></table></div></figure>
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nv">$ </span>sudo pmset -a standbydelay 1200
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 ]]></content>
   </entry>
@@ -75,13 +118,13 @@
   <entry>
     <title type="html"><![CDATA[An algorithm for trending topics]]></title>
     <link href="http://vivekn.com/blog/2014/09/20/an-algorithm-for-trending-topics/"/>
-    <updated>2014-09-20T23:04:00-04:00</updated>
+    <updated>2014-09-20T23:04:00-07:00</updated>
     <id>http://vivekn.com/blog/2014/09/20/an-algorithm-for-trending-topics</id>
-    <content type="html"><![CDATA[<p>In this post I will describe a really simple algorithm for identifying trending items or posts in your application. TF &ndash; IDF (term frequency, inverse document frequency) is a technique that was used to rank search results in early search engines.</p>
+    <content type="html"><![CDATA[<p>In this post I will describe a really simple algorithm for identifying trending items or posts in your application. TF - IDF (term frequency, inverse document frequency) is a technique that was used to rank search results in early search engines.</p>
 
-<p>Assume that you have a large corpus of text documents and want to search a document containing a certain phrase or set of keywords. With TF-IDF, you need to calculate two quantities for each keyword :&ndash;
-1. term frequency &ndash; the number of times the keyword appears in a particular document.
-2. inverse document frequency &ndash; the inverse of the number of documents containing the keyword.</p>
+<p>Assume that you have a large corpus of text documents and want to search a document containing a certain phrase or set of keywords. With TF-IDF, you need to calculate two quantities for each keyword :-
+1. term frequency - the number of times the keyword appears in a particular document.
+2. inverse document frequency - the inverse of the number of documents containing the keyword.</p>
 
 <p>For each document sum up the TF-IDF values of each of the keywords in the query and then rank them. The reason this works is because the IDF part of it helps filter out common words that are present in tons of documents. So a document containing a rare term is given more weight in the search results. Why term frequency is needed is much more obvious as a document containing more occurrences of a keyword is more likely to be the document you are looking for.</p>
 
@@ -97,22 +140,13 @@
   <entry>
     <title type="html"><![CDATA[Writing a web server from scratch - 2]]></title>
     <link href="http://vivekn.com/blog/2014/04/26/writing-a-web-server-from-scratch-part-2/"/>
-    <updated>2014-04-26T21:33:00-04:00</updated>
+    <updated>2014-04-26T21:33:00-07:00</updated>
     <id>http://vivekn.com/blog/2014/04/26/writing-a-web-server-from-scratch-part-2</id>
     <content type="html"><![CDATA[<p>Over the past few days I spent some time writing a web server and it has been very gratifying and I learnt about quite a few things. So let me start off with the design, the thing about web servers is that its quite simple to implement the core functionality but the bulk of it is the plumbing work around parsing the different rules of the HTTP protocol, which I&rsquo;ve kept it to the bare minimum as modern browsers have sane defaults.</p>
 
-
-
-
 <h2>Design</h2>
 
-
-
-
 <p>So the basic outline is like this:</p>
-
-
-
 
 <ol>
 <li>Open a socket, bind it to a port and start accepting connections.</li>
@@ -121,48 +155,21 @@
 <li>Close the socket and any other file descriptors, free resources allocated during the request.</li>
 </ol>
 
-
-
-
 <p>So there are a number of ways how you can implement the listening the listen loop with concurrency (Steps 1 and 2) . A rather naive approach would be to fork a new process on every request and let the child handle the request after closing its access to the server socket. This might appear to work but there is a problem, once you hit 700 requests (or whatever your system&rsquo;s limit for processes per user is) your server will stop working and a lot of other processes that are running in the background will begin to act strangely. The reason is that even if you exit the child process after handling the request, they will exist as <a href="http://en.wikipedia.org/wiki/Zombie_process">zombie processes</a>. Zombies store some state information and take up a very small chunk of memory but cause the kernel to freak out upon reaching the user limit. They are destroyed only when the parent process exits. You can check the limit with the shell command <code>ulimit -a</code>.  So the solution to this will be to service the request in the parent process itself and let the child service the next request. This way the parent process will usually be killed before the child and no zombies will be created. Even if they are created, they will be cleared as soon as the parent completes handling the request. But still this approach has performance problems as we will see later.</p>
-
-
-
 
 <p>A second, more common approach is to create a process pool and is used by servers like Apache. After creating the listening socket, you fork the parent process a number of times to create a process pool. Each of the child processes have a separate file descriptor for the listening socket, but the kernel manages things in a way that they all point to the same socket. So depending on which process is active at that point of time, it gets the client request. Other approaches which I have not explored yet, but will do in the coming few days are multithreading and asynchronous I/O.</p>
 
-
-
-
 <p>Parsing requests and generating responses is fairly straightforward, which is why I only implemented a small subset of the HTTP protocol features.</p>
-
-
-
 
 <h2>Benchmarks</h2>
 
-
-
-
 <p>It&rsquo;s time for some benchmarks, I&rsquo;ll be comparing this file server with Apache httpd and Python&rsquo;s SimpleHTTPServer module which I often use for transferring files across wifi. I&rsquo;m not hoping to compete with Apache on speed here but this should be defenetely  I was thinking that I might have to write another program for stress testing the file servers but fortunately <strong>ab</strong> or ApacheBench comes to the rescue. You can specify the number of requests, number of concurrent connections etc. For the tests each of these servers will be serving a file (the compiled binary of my server) and both client and server will be on the same node. </p>
-
-
-
 
 <p>This is the command I used for testing.</p>
 
-
-
-
 <p><code>ab -n 8000 -c 10 -r localhost/fsrv</code></p>
 
-
-
-
 <p><strong>SimpleHTTPServer</strong> failed with 10 concurrent connections, so I reduced it to 4. But it was still failing, so I reduced the number of requests to 300  and this was the result:</p>
-
-
-
 
 <pre><code>Python SimpleHTTPServer
 
@@ -171,13 +178,7 @@ Time per request:       27.015 [ms] (mean)
 Time per request:       6.754 [ms] (mean, across all concurrent requests)
 </code></pre>
 
-
-
-
 <p>Then I tested <strong>Apache</strong> with the original command, and Apache turned out to be much more robust with over <strong>4100 requests per second</strong>.</p>
-
-
-
 
 <pre><code>Apache httpd
 
@@ -186,13 +187,7 @@ Time per request:       2.432 [ms] (mean)
 Time per request:       0.243 [ms] (mean, across all concurrent requests)
 </code></pre>
 
-
-
-
 <p>So time to test my server, first the fork on every request model</p>
-
-
-
 
 <pre><code>fsrv fork every request
 
@@ -201,13 +196,7 @@ Time per request:       28.149 [ms] (mean)
 Time per request:       2.815 [ms] (mean, across all concurrent requests)
 </code></pre>
 
-
-
-
 <p>Well, its faster than python but doesn&rsquo;t seem all that encouraging, let me try the process pool model with 8 processes.</p>
-
-
-
 
 <pre><code>fsrv process pool (8 procs)
 
@@ -216,18 +205,9 @@ Time per request:       13.169 [ms] (mean)
 Time per request:       1.317 [ms] (mean, across all concurrent requests)
 </code></pre>
 
-
-
-
 <p>Better, but pales in comparison to Apache. Time to run a profiler. On a side note Apple&rsquo;s Instruments is a much better profiler than gprof for profiling C/C++ code. </p>
 
-
-
-
 <p>After running the profiler,  I found that the majority of the time was taken in determining the mime type for a file. I had used the unix <code>file</code> command which does some magic behind the scenes to determine a file&rsquo;s mime type. I had used popen to open a pipe and fed data interactively to it upon each request.</p>
-
-
-
 
 <div class="highlight"><pre><code class="c"><span class="kt">void</span> <span class="nf">get_mime_type</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">filename</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">mime_type</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">static</span> <span class="kt">FILE</span><span class="o">*</span> <span class="n">pipe</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -242,13 +222,7 @@ Time per request:       1.317 [ms] (mean, across all concurrent requests)
 <span class="p">}</span>
 </code></pre></div>
 
-
-
-
 <p>One way to fix this would be to cache the values for each file or just write a basic pure C mime type generator without any external calls based on a few rules. For the time being I decided to use a simple default header for the mime type. Time for the benchmarks again.</p>
-
-
-
 
 <pre><code>fsrv fork every request
 
@@ -257,13 +231,7 @@ Time per request:       3.205 [ms] (mean)
 Time per request:       0.321 [ms] (mean, across all concurrent requests)
 </code></pre>
 
-
-
-
 <p>I was quite surprised with the results as I thought forks would be quite expensive. After a little bit of searching, I came to know that you can fork around 3-4k times a second.</p>
-
-
-
 
 <pre><code>fsrv process pool
 
@@ -272,22 +240,18 @@ Time per request:       1.378 [ms] (mean)
 Time per request:       0.138 [ms] (mean, across all concurrent requests)
 </code></pre>
 
-
-
-
 <p>Incredible! This is about <strong>1.76x</strong> faster than Apache!. So there you have it you can write a simple file server from scratch using only the Unix APIs, that is quite a lot faster than Apache. Though, I must admit that Apache has tons of features that would slow it down. Feel free to check out the code at [<a href="http://github.com/vivekn/fsrv">http://github.com/vivekn/fsrv</a>]</p>
-
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Writing a web server from scratch - 1]]></title>
     <link href="http://vivekn.com/blog/2014/04/07/writing-a-web-server-from-scratch/"/>
-    <updated>2014-04-07T21:15:00-04:00</updated>
+    <updated>2014-04-07T21:15:00-07:00</updated>
     <id>http://vivekn.com/blog/2014/04/07/writing-a-web-server-from-scratch</id>
-    <content type="html"><![CDATA[<p>I have been reading more about system calls in the Unix kernel recently and am thinking of writing a small application to apply what have learnt and gain some experience with systems programming. So, I&rsquo;ll be building a minimalist high performance web server in C over the next few days.</p>
+    <content type="html"><![CDATA[<p>I have been reading more about system calls in the Unix kernel recently and am thinking of writing a small application to apply what have learnt and gain some experience with systems programming. So, I’ll be building a minimalist high performance web server in C over the next few days.</p>
 
-<p>Why reinvent the wheel?, you may ask but this is just to expand my personal knowledge and may not be used by anyone else. So the first step would be get a simple static server running that would be just serving all the files present in a directory provided as an option to it. Architecturally, this wouldn&rsquo;t be radically different from a web server with dynamic content and this is the part I want to focus on for now. So to handle multiple requests concurrently there a number of possible designs like using a pre-forking model, multithreading or using non blocking I/O operations. I will be exploring each one of these methods. There will also be some necessary plumbing tasks like parsing and creating HTTP headers. Creating custom handlers for routes would be an interesting problem. Perhaps, I could extend the project by making a micro web framework in C.</p>
+<p>Why reinvent the wheel?, you may ask but this is just to expand my personal knowledge and may not be used by anyone else. So the first step would be get a simple static server running that would be just serving all the files present in a directory provided as an option to it. Architecturally, this wouldn’t be radically different from a web server with dynamic content and this is the part I want to focus on for now. So to handle multiple requests concurrently there a number of possible designs like using a pre-forking model, multithreading or using non blocking I/O operations. I will be exploring each one of these methods. There will also be some necessary plumbing tasks like parsing and creating HTTP headers. Creating custom handlers for routes would be an interesting problem. Perhaps, I could extend the project by making a micro web framework in C.</p>
 
 <p>I will be blogging about my experiences building this in subsequent posts.</p>
 ]]></content>
@@ -296,11 +260,11 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
   <entry>
     <title type="html"><![CDATA[Efficient spelling correction using BK Trees]]></title>
     <link href="http://vivekn.com/blog/2014/01/27/efficient-spelling-correction-using-bk-trees/"/>
-    <updated>2014-01-27T22:14:00-05:00</updated>
+    <updated>2014-01-27T22:14:00-08:00</updated>
     <id>http://vivekn.com/blog/2014/01/27/efficient-spelling-correction-using-bk-trees</id>
     <content type="html"><![CDATA[<p>I came across an interesting data structure called the BK Tree today. It is useful in coming up with suggestions for spelling correction from a dictionary.</p>
 
-<p>A simple solution for coming up with spelling corrections would be to iterate through all the words in the dictionary and computing the Levenshtein distance with the search term and filtering those words less than some bound. But this would have a complexity of <strong>O(n * m<sup>2</sup>)</strong> where <strong>n</strong> is the number of words and <strong>m</strong>, the average length. But words are not randomly distributed across the alphabet space, hence a large number of these computations are useless. The idea behind the BK tree is to construct a k-ary tree, such that only nodes that are within a particular edit distance are searched. This exploits the fact that the Levenshtein distance forms a metric space. A really nice explanation of constructing and searching through a BK tree is given <a href="http://nullwords.wordpress.com/2013/03/13/the-bk-tree-a-data-structure-for-spell-checking/">here</a>. It is not necessary that the metric used should be Levenshtein distance, you can use any other metric as you see fit.</p>
+<p>A simple solution for coming up with spelling corrections would be to iterate through all the words in the dictionary and computing the Levenshtein distance with the search term and filtering those words less than some bound. But this would have a complexity of <strong>O(n * m^2)</strong> where <strong>n</strong> is the number of words and <strong>m</strong>, the average length. But words are not randomly distributed across the alphabet space, hence a large number of these computations are useless. The idea behind the BK tree is to construct a k-ary tree, such that only nodes that are within a particular edit distance are searched. This exploits the fact that the Levenshtein distance forms a metric space. A really nice explanation of constructing and searching through a BK tree is given <a href="http://nullwords.wordpress.com/2013/03/13/the-bk-tree-a-data-structure-for-spell-checking/">here</a>. It is not necessary that the metric used should be Levenshtein distance, you can use any other metric as you see fit.</p>
 
 <p>It has been observed that for edit distance 2, using a BK tree you need to search only 5-10% of the nodes of the tree. I hacked up a BK Tree <a href="https://github.com/vivekn/autocorrect">implementation</a> in Scala, and was able to load the <code>/usr/share/dict/words</code> file which contains about 250k words in 5 seconds on my MacBook Air. A search query with edit distance 2 takes about 0.06 seconds. Still, I feel there is room for improvement on the performance front. Suggestions welcome.</p>
 
@@ -312,39 +276,25 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
   <entry>
     <title type="html"><![CDATA[The Trouble with SVMs]]></title>
     <link href="http://vivekn.com/blog/2013/04/05/the-trouble-with-svms/"/>
-    <updated>2013-04-05T17:48:00-04:00</updated>
+    <updated>2013-04-05T17:48:00-07:00</updated>
     <id>http://vivekn.com/blog/2013/04/05/the-trouble-with-svms</id>
     <content type="html"><![CDATA[<p>People tend to use complicated machine learning models like support vector machines, just because it is believed to be the model with the best accuracy. The fact that SVMs are available as black box implementations exacerbate this problem. I would suggest focusing on your data instead of using slow techniques that you only partially understand. I achieved better results with a simple Naive Bayes classifier by choosing the right features. The best part is it only takes as much time as it does to read the document unlike an SVM.</p>
-
-
 <p>I had a task of classifying text documents or reviews for sentiment polarity for a college project. I had a dataset of over 50,000 movie reviews with 25,000 positive and 25,000 negative reviews. After dividing my data into training and test data, the first thing I came up with was a Naive Bayes classifier based on the word frequencies of each term in the text. I used add one (or Laplacian) smoothing to handle words which were not in the training set. With this, the accuracy was around 69%. That is bad and is only marginally better than random guessing. I added a mechanism to transfer words to the opposite class when they were negated. That is to say if there is a word like &#8220;not&#8221; followed by some other word, the other word is placed in the opposite class. This along with Multinomial Naive Bayes, i.e counting a word only once in a document, helped increase the accuracy to 82.4%.</p>
-
-
 <p>Then, against my better judgement I decided to try an SVM without completely understanding how it works. I used the TinySVM library and the training took over 45 minutes (vs 1 minute for NB) and resulted in a measly improvement of 0.3%. Not convinced by the black box approach, I decided to learn more about SVMs. The first place I went to were Andrew Ng&#8217;s lectures on Youtube. They helped me gain a general intuition about how an SVM works but the treatment of math was more hand wavy and it didn&#8217;t have anything about the actual algorithm to implement it. The papers on SVMs and SMO (Sequential Minimal Optimization) were too dense and the math was way above my level as I knew nothing about convex optimization. I spent part of the next month watching Stephen Boyd&#8217;s convex optimization lectures. Now I understood about Lagrange multipliers and KKT conditions but the task of implementing an SVM was too daunting. I realized that it may take a few months to write one from scratch. What a waste of time!</p>
-
-
 <p>Now, I thought of removing the features that were only contributing noise to the classifiers. Stop word removal came to my mind but there were research papers suggesting that it actually removes information relevant to sentiment. Mutual information can be used quite effectively for feature selection. It is a measure of correlation of a feature with the whole dataset. Since it was based on probabilities, it suited my Naive Bayes model very well. So I reduced the number of features from over 300,000 words to 6,000. I chose this number by plotting a graph of the accuracy v/s the number of features. The accuracy shot up to 85.2% and the training time was still under a minute.&nbsp;</p>
-
-
 <p>The fact that I could throw away irrelevant features meant I could initially define a very large number of features and then prune the irrelevant ones. So I added bigrams and trigrams as additional features. The feature space had now increased to 11 million. By selecting the top 32,000 features by mutual information, I was able to get an accuracy of 88.89%. There was a <a href="http://ai.stanford.edu/~amaas/papers/wvSent_acl2011.pdf">paper</a> by Andrew Maas of Stanford achieving an accuracy of 88.89% using complicated vector space and probability models on the same dataset. Naive Bayes comes within 0.1% of that.</p>
-
-
 <p>The lesson from this is that you can achieve a lot using a very simple algorithm, if you&nbsp;focus on selecting the right features for your data. No need to resort to complex black box models.</p>
 
-
-
-
 <p> <a href="http://sentiment.vivekn.com"> Here </a> is a link to the sentiment analyzer to play around with. </p>
-
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[The Travelling Santa Problem]]></title>
     <link href="http://vivekn.com/blog/2012/12/30/travelling-santa-problem/"/>
-    <updated>2012-12-30T17:48:00-05:00</updated>
+    <updated>2012-12-30T17:48:00-08:00</updated>
     <id>http://vivekn.com/blog/2012/12/30/travelling-santa-problem</id>
-    <content type="html"><![CDATA[<p>I spent the past couple of days on a problem called the &ldquo;Travelling Santa Problem&rdquo;, a variant of the NP complete &ldquo;<a href="en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling Salesman Problem</a>&rdquo;. There is an ongoing competition on Kaggle, a site which hosts various machine learning and optimization contests. In the original TSP problem you need to find a tour of a graph, visiting every vertex exactly once, minimizing the total cost. Since there can be an arbitrarily large (exponential in number of vertices) number of such paths (Hamiltonian cycles), no polynomial time exact algorithm is known for this problem. Applications of TSP are in the areas of scheduling, logistics and implementation of electronic circuitry. Kaggle&rsquo;s <a href="http://www.kaggle.com/c/traveling-santa-problem">version</a> of the problem gives you a set of 150000 points on a two dimensional plane, and you need to find two paths, that visit all the points and have no edges that are common to both the paths, ie, disjoint paths. The aim of the contest is to find the minimum distance and your score is the distance on the longer path.</p>
+    <content type="html"><![CDATA[<p>I spent the past couple of days on a problem called the “Travelling Santa Problem”, a variant of the NP complete “<a href="en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling Salesman Problem</a>”. There is an ongoing competition on Kaggle, a site which hosts various machine learning and optimization contests. In the original TSP problem you need to find a tour of a graph, visiting every vertex exactly once, minimizing the total cost. Since there can be an arbitrarily large (exponential in number of vertices) number of such paths (Hamiltonian cycles), no polynomial time exact algorithm is known for this problem. Applications of TSP are in the areas of scheduling, logistics and implementation of electronic circuitry. Kaggle’s <a href="http://www.kaggle.com/c/traveling-santa-problem">version</a> of the problem gives you a set of 150000 points on a two dimensional plane, and you need to find two paths, that visit all the points and have no edges that are common to both the paths, ie, disjoint paths. The aim of the contest is to find the minimum distance and your score is the distance on the longer path.</p>
 
 <p>If you visualize the set of points, you get a picture of Santa.</p>
 
@@ -352,24 +302,25 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
 
 <p>They provided a benchmark of random paths to get started with, that is two completely random sequences of points. It had a score of about 1.3 billion, and at that time the leader had a score of 6.5 million. I decided to start with a very simple heuristic, which was to sort the points according to their x coordinate and connect the path from left to right. With this I could find a single path, but what about the second path? The disjoint path condition makes this a little trickier. But given the first path, it should be easy to check if adding a node to the second path will be valid. Since every node would have a maximum of two connections, we just need to store the ids of the previous and next nodes for each node in the first sequence. So using this, I sorted the points according to the y coordinate and started building the second path from top to bottom, if there was an edge that would be repeated from the first path, I would simply select a random vertex and make a connection. So now that I had two disjoint paths, I decided to make a submission, the score turned out to be 400 million. Much better than random, but way behind the leaders and quite inefficient. If you come to think of it, this approach would create a very zig-zag path on random data. The disjointness condition forces you to add random edges to the second path, which take the distance up even further. So time for a different strategy.</p>
 
-<p>So the next heuristic I tried was the nearest neighbour approach. If you connect each node to its nearest neighbour, you should get a shorter path and this is quite intuitive. But the problem here is, it would have a complexity of O(n<sup>2</sup>) and there are 150,000 points, go figure. A <a href="en.wikipedia.org/wiki/K-d_tree">k-d tree</a> can find the nearest neighbour in O(n lg n) time, but its implementation is non trivial and it would be pretty much useless for generating a second disjoint path, we would still have to rely on random links. Time for an approximation of nearest neighbours: its highly likely that the nearest neighbour would lie on one of the points closest by x or y coordinates. This can be found by simply sorting the points and considering the <strong>k</strong> nearest such points and finding the nearest neighbour (we can also check for the disjointness condition, while doing so). Doing this on the nearest 100 points for each node, got me a solution with a score of 25 million. I decided to increase the number of points, and at around 4000 points, I could get a solution of around 8.5 million and the code runs in a minute. Within 30% of the leaders, not bad, huh?. So now, how can this be improved further.</p>
+<p>So the next heuristic I tried was the nearest neighbour approach. If you connect each node to its nearest neighbour, you should get a shorter path and this is quite intuitive. But the problem here is, it would have a complexity of O(n^2) and there are 150,000 points, go figure. A <a href="en.wikipedia.org/wiki/K-d_tree">k-d tree</a> can find the nearest neighbour in O(n lg n) time, but its implementation is non trivial and it would be pretty much useless for generating a second disjoint path, we would still have to rely on random links. Time for an approximation of nearest neighbours: its highly likely that the nearest neighbour would lie on one of the points closest by x or y coordinates. This can be found by simply sorting the points and considering the <strong>k</strong> nearest such points and finding the nearest neighbour (we can also check for the disjointness condition, while doing so). Doing this on the nearest 100 points for each node, got me a solution with a score of 25 million. I decided to increase the number of points, and at around 4000 points, I could get a solution of around 8.5 million and the code runs in a minute. Within 30% of the leaders, not bad, huh?. So now, how can this be improved further.</p>
 
-<p>I opened CLRS to look for ideas, there was an approximation scheme called the 2-approximation scheme which is based on finding vertices on a walk of a minimum spanning tree. CLRS has an elegant proof of how it is less than twice the minimum possible value, and in practice much better than that. But the problem is in creating the minimum spanning tree. Using Prim&rsquo;s algorithm would have a complexity of O(n<sup>2</sup> lg n), which is not feasible. It turns out that an MST for a Euclidean plane can be created in O(n lg n) time using a <a href="en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> or a <a href="en.wikipedia.org/wiki/Delaunay_triangulation">Delaunuay triangulation</a>. As I had no background in computational geometry, I decided not to go down that path. Creating an approximate MST taking 40 nearest by x or y coordinates yielded a poor result.</p>
+<p>I opened CLRS to look for ideas, there was an approximation scheme called the 2-approximation scheme which is based on finding vertices on a walk of a minimum spanning tree. CLRS has an elegant proof of how it is less than twice the minimum possible value, and in practice much better than that. But the problem is in creating the minimum spanning tree. Using Prim’s algorithm would have a complexity of O(n^2 lg n), which is not feasible. It turns out that an MST for a Euclidean plane can be created in O(n lg n) time using a <a href="en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> or a <a href="en.wikipedia.org/wiki/Delaunay_triangulation">Delaunuay triangulation</a>. As I had no background in computational geometry, I decided not to go down that path. Creating an approximate MST taking 40 nearest by x or y coordinates yielded a poor result.</p>
 
 <p>An optimization technique, that was mentioned a lot in the forums was <a href="http://en.wikipedia.org/wiki/2-opt">2-opt</a>. It is a local optimization technique, that involves taking two adjacent edges, and replacing them with a different combination that reduces the distance. If you have a sequence of points ABCD, you replace it with ACBD if it has a lower cost. I tried this technique, by randomly picking consecutive edges and swapping vertices if they had a lower cost. Even after 1 billion iterations and 45 minutes, it only yielded an improvement of 0.1%. It was getting stuck at a local minimum. Then I ran the optimization in a sequential order of all vertices in the path, instead of random choice, it converged in 5-6 iterations and yielded a 2-3% improvement.</p>
 
-<p>There is a randomized algorithm known as <a href="en.wikipedia.org/wiki/Simulated_annealing">simulated annealing</a> based on the metallurgical principle of annealing, a metal is heated to a high temperature and allowed to cool slowly to remove crystal imperfections. Heating allows a different configuration to be reached, and on cooling the imperfection is removed. Here, perturbations of the sequence are created using 2-opt and during the high temperature phase, changes are accepted even if it increases the total cost. In the cooling phase the acceptance rule is tightened until a point is reached where only those moves that reduce the cost are accepted. This helps in finding a global optimum. Unfortunately, this algorithm didn&rsquo;t improve the solution by much even after running for an hour.</p>
+<p>There is a randomized algorithm known as <a href="en.wikipedia.org/wiki/Simulated_annealing">simulated annealing</a> based on the metallurgical principle of annealing, a metal is heated to a high temperature and allowed to cool slowly to remove crystal imperfections. Heating allows a different configuration to be reached, and on cooling the imperfection is removed. Here, perturbations of the sequence are created using 2-opt and during the high temperature phase, changes are accepted even if it increases the total cost. In the cooling phase the acceptance rule is tightened until a point is reached where only those moves that reduce the cost are accepted. This helps in finding a global optimum. Unfortunately, this algorithm didn’t improve the solution by much even after running for an hour.</p>
 
-<p>I could get one path at around 7.1 million and the second at 8.25 million under 5 minutes of running time using sequential 2-opt. So the difference in the two paths could be the main culprit. The <a href="http://www.research.att.com/~dsj/papers/TSPchapter.pdf">Lin &ndash; Kernighan</a> heuristic is considered to be one of the best heuristics for TSP and it is a generalization of 2-opt. But my motivation to read more about it diminished after seeing some posts in the competition forum, that some of the leaders ran their programs for days, and worse, even weeks to get their results. In my opinion running a program for days to achieve a very marginal improvement is totally not justified. This was really disturbing and I decided to quit the competition.</p>
+<p>I could get one path at around 7.1 million and the second at 8.25 million under 5 minutes of running time using sequential 2-opt. So the difference in the two paths could be the main culprit. The <a href="http://www.research.att.com/~dsj/papers/TSPchapter.pdf">Lin - Kernighan</a> heuristic is considered to be one of the best heuristics for TSP and it is a generalization of 2-opt. But my motivation to read more about it diminished after seeing some posts in the competition forum, that some of the leaders ran their programs for days, and worse, even weeks to get their results. In my opinion running a program for days to achieve a very marginal improvement is totally not justified. This was really disturbing and I decided to quit the competition.</p>
 
 <p>What I learned from this competition was that NP complete problems could be approximated reasonably within a short amount of time, and the last mile takes a <strong>humongous</strong> effort, and whether its worth it is questionable. I also got to know about some randomized algorithms and Monte Carlo simulations. You can find my C++ code over <a href="https://github.com/vivekn/tsp-heuristics">here</a>.</p>
+
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Roll your own autocomplete solution using Tries]]></title>
     <link href="http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries/"/>
-    <updated>2012-02-25T17:48:00-05:00</updated>
+    <updated>2012-02-25T17:48:00-08:00</updated>
     <id>http://vivekn.com/blog/2012/02/25/roll-your-own-autocomplete-solution-using-tries</id>
     <content type="html"><![CDATA[<p>You might have come across many websites with autocomplete suggestions, most notably Google.</p>
 
@@ -385,37 +336,32 @@ Time per request:       0.138 [ms] (mean, across all concurrent requests)
 <li>The children at each node are ideally represented using a hash table mapping the next character to the child nodes.</li>&#13;
 <li>Its also useful to set a flag at every node to indicate whether a word/phrase ends there.</li>&#13;
 </ol>
-
-
 <p>Now we can define methods to insert a string and to search for one.</p>
 
 <script src="https://gist.github.com/1906905.js?file=trie.py"></script>
 
-
-<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node&rsquo;s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
+<p>The insertion cost has a linear relationship with the string length. Now lets define the methods for listing all the strings which start with a certain prefix. The idea is to traverse down to the node representing the prefix and from there do a breadth first search of all the nodes that are descendants of the prefix node. We check if the node is at a word boundary from the flag we defined earlier and append the node’s value to the results. A caveat of the recursive approach, is you might run into stack depth problems when the maximum length of a string reaches tens of thousands of characters.</p>
 
 <script src="https://gist.github.com/1906922.js?file=trie.py"></script>
 
-
 <p>To delete an item,  first traverse down to the leaf of the keyword and then work backwards, checking for common paths.</p>
 
-<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete"><a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a></a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
+<p>And there you have it, an efficient way of retrieving strings with a common prefix in less than 40 lines of python code. I also wrote a C++ version using the STL data structures in about 90 lines, the time complexity for this version however is <strong>O(n log n)</strong> as the STL uses a red-black tree implementation for an associative array. Colin Dean has wrote a Ruby version and Marcus McCurdy, a Java one. You can find them all over here - <a href="https://github.com/vivekn/autocomplete">https://github.com/vivekn/autocomplete</a>. Read more about tries at <a href="http://en.wikipedia.org/wiki/Trie" title="Wikipedia" target="_blank">Wikipedia</a>.</p>
 
 <p><strong>Update: </strong>Thanks to bmahler on reddit for pointing out that the wordlist approach was unnecessary and space inefficient. It has been corrected.</p>
 
 <div style="display: none;">
-    trie data structure <br>
-    trie algorithm <br>
-    trie autocomplete <br>
-    autocomplete <br>
-    autosuggest <br>
-    autocomplete algorithm<br>
-    autosuggest algorithm<br>
-    trie implementation <br>
-    input autocomplete <br>
-    autocomplete algorithm <br>
+	trie data structure <br />
+	trie algorithm <br />
+	trie autocomplete <br />
+	autocomplete <br />
+	autosuggest <br />
+	autocomplete algorithm<br />
+	autosuggest algorithm<br />
+	trie implementation <br />
+	input autocomplete <br />
+	autocomplete algorithm <br />
 </div>
-
 ]]></content>
   </entry>
   

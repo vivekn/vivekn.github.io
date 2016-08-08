@@ -4,6 +4,8 @@ title: "Roll your own autocomplete solution using Tries"
 date: 2012-02-25 17:48
 comments: true
 categories: algorithms python
+draft: true
+
 ---
 You might have come across many websites with autocomplete suggestions, most notably Google.
 

@@ -4,6 +4,8 @@ title: "The Trouble with SVMs"
 date: 2013-04-05 17:48
 comments: true
 categories: machine-learning sentiment
+draft: true
+
 ---
 <p>People tend to use complicated machine learning models like support vector machines, just because it is believed to be the model with the best accuracy. The fact that SVMs are available as black box implementations exacerbate this problem. I would suggest focusing on your data instead of using slow techniques that you only partially understand. I achieved better results with a simple Naive Bayes classifier by choosing the right features. The best part is it only takes as much time as it does to read the document unlike an SVM.</p>
 <p>I had a task of classifying text documents or reviews for sentiment polarity for a college project. I had a dataset of over 50,000 movie reviews with 25,000 positive and 25,000 negative reviews. After dividing my data into training and test data, the first thing I came up with was a Naive Bayes classifier based on the word frequencies of each term in the text. I used add one (or Laplacian) smoothing to handle words which were not in the training set. With this, the accuracy was around 69%. That is bad and is only marginally better than random guessing. I added a mechanism to transfer words to the opposite class when they were negated. That is to say if there is a word like "not" followed by some other word, the other word is placed in the opposite class. This along with Multinomial Naive Bayes, i.e counting a word only once in a document, helped increase the accuracy to 82.4%.</p>
