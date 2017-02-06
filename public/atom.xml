@@ -4,7 +4,7 @@
   <title><![CDATA[Vivek Narayanan's blog]]></title>
   <link href="http://vivekn.com/atom.xml" rel="self"/>
   <link href="http://vivekn.com/"/>
-  <updated>2016-08-07T22:48:25-07:00</updated>
+  <updated>2017-02-05T21:24:44-08:00</updated>
   <id>http://vivekn.com/</id>
   <author>
     <name><![CDATA[Vivek Narayanan]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sparsely gated mixture of experts - paper notes]]></title>
+    <link href="http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/"/>
+    <updated>2017-02-05T21:07:00-08:00</updated>
+    <id>http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes</id>
+    <content type="html"><![CDATA[<p>“<a href="https://openreview.net/pdf?id=B1ckMDqlg">The sparsely gated mixture of experts layer</a>” is an interesting paper by Geoffrey Hinton and others at Google. </p>
+
+<p>When you have a large number of training examples and you want to extract the most out of your data, one way of doing it would be increasing the capacity of the machine learning models. But this also means that for small incremental gains in accuracy, you have to increase the number of parameters by a few orders of magnitude. This is computationally very expensive, if the entire network is activated for each example. But only certain parts of the network might be needed for different types of inputs. This could be done deterministically by training multiple models and selecting a particular model based on certain heuristics.</p>
+
+<p>But it might be hard to come up with such heuristics and decide what to include in each model. This paper introduces the concept of a trainable gating layer. The model is a collection of experts, each individual expert can be a feedforward neural network, the gating layer selects a small number of experts for each input.</p>
+
+<script type="math/tex; mode=display"> y = \sum_{i=1}^{n} G(x)_i E_i(x) </script>
+
+<script type="math/tex; mode=display"> G(x) = Softmax(PreserveTopK(W_gx)) </script>
+
+<p>The gating function is a modified softmax layer, which sets the values not in the top <script type="math/tex">k</script> to <script type="math/tex">-\infty</script>. It can be trained jointly with the expert networks using gradient descent. This sparsity ensures that both training and prediction can be really fast as the zeroed out networks don’t need to be evaluated or backpropagated through. The final prediction is a sparse linear combination of the experts. </p>
+
+<p>There are some issues with this approach though, during training the weights on some of the experts can get larger and due to reinforcement only these experts would be trained. The authors suggest two ways to solve this.</p>
+
+<ol>
+  <li>
+    <p>Adding Gaussian noise to the outputs before applying the softmax.</p>
+  </li>
+  <li>
+    <p>Introduce a loss penalty for unbalanced distribution of examples to experts, penalizing high variance in the distribution of examples.</p>
+  </li>
+</ol>
+
+<script type="math/tex; mode=display"> \text{Importance}_i = \sum_{x \in X} G_i(x)  </script>
+
+<script type="math/tex; mode=display"> \text{loss}_{\text{imp}} = w_i CV(\text{Importance}_i) </script>
+
+<p>The coefficient of variation (<script type="math/tex">CV</script>) is the ratio of standard deviation to the mean of a random variable. </p>
+
+<p>If there are hundreds of experts and mini-batch training is used, each expert network will only receive a small number of examples per batch, which would be computationally inefficient. So, the batch size should be as large as possible. But for a large batch size, all the activations and weight updates should be stored in memory, which is also infeasible for a large number of neural networks. They suggest using a very large batch size for the gating network and then sharding the individual models across multiple machines and training with model parallelism. This way individual networks will still have reasonable batch sizes and it also helps with memory usage during evaluation time.</p>
+
+<p>This is an interesting way of increasing the capacity of the model while keeping computational costs reasonable. Different experts can act on different properties of the data and all of them need not be active simultaneously.</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using reinforcement learning to train neural networks.]]></title>
@@ -49,14 +90,13 @@
 
 <p>We can approximate this gradient computation as follows: start by sampling an action $a_1$ from the policy and observe the rewards. Continue sampling $a_{t} | a_{1:t-1}$  according to the policy and finally backpropagate the sum of rewards to the network. We can have the network output the log probabilities $\log p_\theta(a_t | a_{1:t-1})$ at each time step for each action, which can be used to sample the next action. And since we already know how to compute the gradients for the network, we can use this model to train a neural net which to optimize for a  score function that is not necessarily differentiable.</p>
 
-<p> But this algorithm can be slow to converge for very large action spaces like text generation, so it is better to pretrain the model with a cross entropy loss and then slowly introduce the REINFORCE step with an annealing schedule. That is, you alternate between REINFORCE and cross entropy training, slowly increasing the proportion of REINFORCE iterations.  
+<p> But this algorithm can be slow to converge for very large action spaces like text generation, so it is better to pretrain the model with a cross entropy loss and then slowly introduce the REINFORCE step with an annealing schedule. That is, you alternate between REINFORCE and cross entropy training, slowly increasing the proportion of REINFORCE iterations.  </p>
 
-
-References
-&#8212;&#8211;
-  * Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992
-  * Zaremba, Wojciech, and Ilya Sutskever. &#8220;Reinforcement Learning Neural Turing Machines-Revised.&#8221; arXiv preprint arXiv:1505.00521 (2015).
-</p>
+<h2 id="references">References</h2>
+<ul>
+  <li>Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992</li>
+  <li>Zaremba, Wojciech, and Ilya Sutskever. “Reinforcement Learning Neural Turing Machines-Revised.” arXiv preprint arXiv:1505.00521 (2015).</li>
+</ul>
 ]]></content>
   </entry>
   
