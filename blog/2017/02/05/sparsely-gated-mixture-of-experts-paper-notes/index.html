@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Vivek Narayanan's blog</title>
+  <title>Sparsely gated mixture of experts - paper notes - Vivek Narayanan's blog</title>
   <meta name="author" content="Vivek Narayanan">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://vivekn.com">
+  <link rel="canonical" href="http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Vivek Narayanan's blog" type="application/atom+xml">
@@ -89,16 +89,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/">Sparsely Gated Mixture of Experts - Paper Notes</a></h1>
+      <h1 class="entry-title">Sparsely Gated Mixture of Experts - Paper Notes</h1>
     
     
       <p class="meta">
@@ -116,15 +112,15 @@
 
 <time datetime="2017-02-05T21:07:00-08:00" pubdate data-updated="true">Feb 5<span>th</span>, 2017</time>
         
-           | <a href="/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/#disqus_thread"
-             data-disqus-identifier="http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/">Comments</a>
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://vivekn.com">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>“<a href="https://openreview.net/pdf?id=B1ckMDqlg">The sparsely gated mixture of experts layer</a>” is an interesting paper by Geoffrey Hinton and others at Google. </p>
+<div class="entry-content"><p>“<a href="https://openreview.net/pdf?id=B1ckMDqlg">The sparsely gated mixture of experts layer</a>” is an interesting paper by Geoffrey Hinton and others at Google. </p>
 
 <p>When you have a large number of training examples and you want to extract the most out of your data, one way of doing it would be increasing the capacity of the machine learning models. But this also means that for small incremental gains in accuracy, you have to increase the number of parameters by a few orders of magnitude. This is computationally very expensive, if the entire network is activated for each example. But only certain parts of the network might be needed for different types of inputs. This could be done deterministically by training multiple models and selecting a particular model based on certain heuristics.</p>
 
@@ -158,24 +154,16 @@
 <p>This is an interesting way of increasing the capacity of the model while keeping computational costs reasonable. Different experts can act on different properties of the data and all of them need not be active simultaneously.</p>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/">Using Reinforcement Learning to Train Neural Networks.</a></h1>
-    
-    
-      <p class="meta">
-        
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Vivek Narayanan</span></span>
+
+      
 
 
 
@@ -187,68 +175,40 @@
   
 
 
-<time datetime="2016-08-07T18:23:00-07:00" pubdate data-updated="true">Aug 7<span>th</span>, 2016</time>
-        
-           | <a href="/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/#disqus_thread"
-             data-disqus-identifier="http://vivekn.com/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/">Comments</a>
-        
-      </p>
+<time datetime="2017-02-05T21:07:00-08:00" pubdate data-updated="true">Feb 5<span>th</span>, 2017</time>
+      
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>A common theme with several machine learning tasks that involve sequences is that you need to generate a sequence one term at a time. Examples are any kind of text generation, image captioning, time series predictions, machine translation, or a task where you have to make a sequence of decisions and you get reward signals only once in a while. Ideally we would want to maximize a score that takes the entire sequence into account. But it is hard to backpropagate these scores, as they usually tend to be non differentiable. So we have to resort to something like using a cross entropy loss for each term in the sequence. This isn&#8217;t great because it allows for errors to accumulate at each step during prediction time, as we are using the previous prediction as an input.</p>
-
-<p>One way of approaching this problem is to use the non differentiable rewards/scores that take into account the whole sequence by applying the REINFORCE algorithm. For this we need to treat the neural network as a reinforcement learning agent. For example, the hidden state of an RNN can be the state of the agent and an action can be predicting the next term in the sequence. A score associated with generating a sequence according to the goal of the task is a reward.</p>
-
-<h2 id="the-reinforce-algorithm">The REINFORCE algorithm</h2>
-
-<p> The setting is as follows: we have an agent that can take actions from a set $A$. Let $a_t$ denote the action it takes at time $t$. It samples an action according to a probability distribution $p_\theta(a_t | a_{1:t-1})$. It might get a reward $r(a_{1:t})$ at each time step. And the episode terminates at some variable length $T$, if the reward takes the whole sequence into account, $r(a_{1:T})$ might be the only reward in the episode. So, the goal here is to maximize the expected future reward $J(\theta)$. Let $\mathcal{A}$ be the set of all sequences of actions that terminate.  </p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-
-\begin{align}
-    \text{Let, } R(a_{1:T}) &= \sum_{t=1}^{T} r(a_{1:T})\\
-    J(\theta) &= \sum_{a_{1:T} \in \mathcal{A}} p_\theta(a_{1:T}) R(a_{1:T})
-\end{align}
- %]]></script>
-
-<p>Since we want to maximize $J(\theta)$, we are interested in its gradient, which can be written as an expectation.</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-
-\begin{align}
-    \frac{\partial J(\theta)}{ \partial \theta} &=
-    \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{1}{p_\theta(a_{1:T})}\frac{\partial p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
-    &= \sum_{a_{1:T} \in \mathcal{A}}  p_\theta(a_{1:T}) \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
-    &= \mathbb{E}_{a_{1:T} \sim p_{\theta}} \frac{\partial \log p_\theta(a_{1:T}) }{  \partial \theta}R(a_{1:T}) \\
-    &= \mathbb{E}_{a_1 \sim p_{\theta}(a_1)} \mathbb{E}_{a_2 \sim p_{\theta}(a_2|a_1)} ... \mathbb{E}_{a_n \sim p_{\theta}(a_T | a_{1:T-1})} \sum_{t=1}^{T}  \frac{\partial \log p_\theta(a_t | a_{1:t-1}) }{  \partial \theta} R(a_{1:T}) \\
-\end{align}
- %]]></script>
-
-<p>We can approximate this gradient computation as follows: start by sampling an action $a_1$ from the policy and observe the rewards. Continue sampling $a_{t} | a_{1:t-1}$  according to the policy and finally backpropagate the sum of rewards to the network. We can have the network output the log probabilities $\log p_\theta(a_t | a_{1:t-1})$ at each time step for each action, which can be used to sample the next action. And since we already know how to compute the gradients for the network, we can use this model to train a neural net which to optimize for a  score function that is not necessarily differentiable.</p>
-
-<p> But this algorithm can be slow to converge for very large action spaces like text generation, so it is better to pretrain the model with a cross entropy loss and then slowly introduce the REINFORCE step with an annealing schedule. That is, you alternate between REINFORCE and cross entropy training, slowly increasing the proportion of REINFORCE iterations.  </p>
-
-<h2 id="references">References</h2>
-<ul>
-  <li>Williams, Ronald J. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992</li>
-  <li>Zaremba, Wojciech, and Ilya Sutskever. “Reinforcement Learning Neural Turing Machines-Revised.” arXiv preprint arXiv:1505.00521 (2015).</li>
-</ul>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/" data-via="_vivek_n" data-counturl="http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/08/07/using-reinforcement-learning-to-train-neural-networks/" title="Previous Post: Using reinforcement learning to train neural networks.">&laquo; Using reinforcement learning to train neural networks.</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -276,6 +236,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -290,7 +251,10 @@
       var disqus_shortname = 'viveknblog';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/';
+        var disqus_url = 'http://vivekn.com/blog/2017/02/05/sparsely-gated-mixture-of-experts-paper-notes/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
